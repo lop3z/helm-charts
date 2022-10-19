@@ -24,6 +24,28 @@ entries:
     - https://github.com/lop3z/helm-charts/releases/download/metabase-2.2.0/metabase-2.2.0.tgz
     version: 2.2.0
   - apiVersion: v2
+    appVersion: v0.44.5
+    created: "2022-10-19T10:10:56.478906514Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.1.17
+    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    digest: 0c72dcff92bd9e53d11bde535786167865a4c45ad80be7e94f9c1cf560dd255a
+    home: http://www.metabase.com/
+    icon: http://www.metabase.com/images/logo.svg
+    maintainers:
+    - email: phamminhthanh69@gmail.com
+      name: pmint93
+    name: metabase
+    sources:
+    - https://github.com/metabase/metabase
+    - https://github.com/pmint93/helm-charts/metabase
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/metabase-2.1.8/metabase-2.1.8.tgz
+    version: 2.1.8
+  - apiVersion: v2
     appVersion: v0.44.3
     created: "2022-09-20T03:17:47.909100007Z"
     dependencies:
