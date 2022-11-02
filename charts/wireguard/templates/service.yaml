@@ -1,0 +1,20 @@
+{{- if .Values.service.enabled }}
+kind: Service
+apiVersion: v1
+metadata:
+  name: "{{.Release.Name }}-wireguard"
+  labels:
+    app: "{{ .Release.Name }}-wireguard"
+{{- if .Values.service.labels }}
+{{ toYaml .Values.service.labels | indent 4 }}
+{{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - name: wg
+    protocol: UDP
+    port: {{ .Values.service.port }}
+    targetPort: 51820
+  selector:
+    app: "{{ .Release.Name }}-wireguard"
+{{- end }}
