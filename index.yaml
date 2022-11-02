@@ -457,4 +457,17 @@ entries:
     urls:
     - https://github.com/pmint93/helm-charts/releases/download/metabase-0.13.0/metabase-0.13.0.tgz
     version: 0.13.0
+  wireguard:
+  - apiVersion: v2
+    appVersion: 0.0.0
+    created: "2022-11-02T16:33:47.070896211Z"
+    description: A Helm chart for managing a wireguard vpn in kubernetes
+    digest: ecdf356903d5ebef67e700114506ff710b73c30699fef677fa25c6c48f64e75d
+    maintainers:
+    - name: bryopsida
+    name: wireguard
+    type: application
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/wireguard-0.4.0/wireguard-0.4.0.tgz
+    version: 0.4.0
 generated: "2020-11-10T13:10:51.457964191Z"
