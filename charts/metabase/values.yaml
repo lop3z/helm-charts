@@ -3,11 +3,13 @@
 # https://github.com/metabase/metabase/issues/2754
 # NOTE: Should remain 1
 replicaCount: 1
+deploymentAnnotations: {}
+deploymentLabels: {}
 podAnnotations: {}
 podLabels: {}
 image:
   repository: metabase/metabase
-  tag: v0.44.5
+  tag: v0.45.1
   command: []
   pullPolicy: IfNotPresent
   pullSecrets: []
@@ -73,8 +75,7 @@ database:
     ## ref: https://console.cloud.google.com/gcr/images/cloudsql-docker/GLOBAL/gce-proxy
     # sidecarImageTag: latest
     ## ref: https://cloud.google.com/sql/docs/postgres/connect-kubernetes-engine#running_the_as_a_sidecar
-    resources:
-      {}
+    resources: {}
 
 password:
   # Changing Metabase password complexity:

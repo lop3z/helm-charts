@@ -1,9 +1,10 @@
-apiVersion: v2
-description: The easy, open source way for everyone in your company to ask questions
+apiVersion: v1
+description:
+  The easy, open source way for everyone in your company to ask questions
   and learn from data.
 name: metabase
-version: 2.1.8
-appVersion: v0.44.5
+version: 2.4.0
+appVersion: v0.45.1
 maintainers:
   - name: pmint93
     email: phamminhthanh69@gmail.com
