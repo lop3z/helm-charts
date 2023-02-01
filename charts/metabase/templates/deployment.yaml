@@ -61,6 +61,10 @@ spec:
             value: {{ .Values.listen.host | quote }}
           - name: MB_JETTY_PORT
             value: {{ .Values.listen.port | quote }}
+          {{- if .Values.monitoring.enabled }}
+          - name: MB_PROMETHEUS_SERVER_PORT
+            value: {{ .Values.monitoring.port  | quote }}
+          {{- end }}
           {{- if .Values.ssl.enabled }}
           - name: MB_JETTY_SSL
             value: true
@@ -136,6 +140,10 @@ spec:
           - name: JAVA_OPTS
             value: "-Dlog4j.configuration=file:/tmp/conf/log4j.properties"
             {{- end }}
+            {{- if .Values.log4j2XML }}
+          - name: JAVA_OPTS
+            value: "-Dlog4j.configurationFile=file:/tmp/conf/log4j2.xml"
+            {{- end }}
           {{- end }}
           {{- if .Values.pluginsDirectory }}
           - name: MB_PLUGINS_DIR
@@ -166,6 +174,10 @@ spec:
           {{- end }}
           ports:
             - containerPort: {{ .Values.service.internalPort }}
+            {{- if .Values.monitoring.enabled }}
+            - containerPort: {{ .Values.monitoring.port }}
+              name: metrics
+            {{- end }}
           livenessProbe:
             httpGet:
               path: {{ .Values.livenessProbe.path }}
@@ -180,9 +192,9 @@ spec:
             initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
             timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
             periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
-          {{- if or .Values.log4jProperties (ne (len .Values.extraVolumeMounts) 0) }}
+          {{- if or .Values.log4jProperties .Values.log4j2XML (ne (len .Values.extraVolumeMounts) 0) }}
           volumeMounts:
-            {{- if .Values.log4jProperties }}
+            {{- if or .Values.log4jProperties .Values.log4j2XML }}
             - name: config
               mountPath: /tmp/conf/
             {{- end }}
@@ -248,13 +260,19 @@ spec:
       {{- end }}
       serviceAccountName: {{ template "metabase.serviceAccountName" . }}
       volumes:
-        {{- if .Values.log4jProperties}}
+        {{- if or .Values.log4jProperties .Values.log4j2XML }}
         - name: config
           configMap:
             name: {{ template "metabase.fullname" . }}-config
             items:
+            {{- if .Values.log4jProperties }}
             - key: log4j.properties
               path: log4j.properties
+            {{- end }}
+            {{- if .Values.log4j2XML}}
+            - key: log4j2.xml
+              path: log4j2.xml
+            {{- end }}
         {{- end }}
         {{- if ne (len .Values.extraVolumes) 0 }}
           {{ toYaml .Values.extraVolumes | nindent 8 }}
