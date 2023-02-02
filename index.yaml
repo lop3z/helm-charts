@@ -2,9 +2,28 @@ apiVersion: v1
 entries:
   metabase:
   - apiVersion: v1
+    appVersion: v0.45.2
+    created: "2023-02-02T07:24:07.983484761Z"
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
+    digest: ec2847f1eb514b048d0e487f425319649eeef74ad8506ab36a835884acfef0ef
+    home: http://www.metabase.com/
+    icon: http://www.metabase.com/images/logo.svg
+    maintainers:
+    - email: phamminhthanh69@gmail.com
+      name: pmint93
+    name: metabase
+    sources:
+    - https://github.com/metabase/metabase
+    - https://github.com/pmint93/helm-charts/metabase
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/metabase-2.6.1/metabase-2.6.1.tgz
+    version: 2.6.1
+  - apiVersion: v1
     appVersion: v0.45.1
     created: "2022-12-19T13:31:45.507037453Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: d842f50307543c968d4d301c9024d78daa8b123b3e22dd237eb9042630301241
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -26,7 +45,8 @@ entries:
       name: postgresql
       repository: https://charts.bitnami.com/bitnami
       version: 11.1.17
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: 3cd76c8e548fda913c4de185420b1d2b379cbc1532857b4f41106d68d0c86424
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -48,7 +68,8 @@ entries:
       name: postgresql
       repository: https://charts.bitnami.com/bitnami
       version: 11.1.17
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: 0c72dcff92bd9e53d11bde535786167865a4c45ad80be7e94f9c1cf560dd255a
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -70,7 +91,8 @@ entries:
       name: postgresql
       repository: https://charts.bitnami.com/bitnami
       version: 11.1.17
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: 71d4bd52795199ef5a67f5f00b4657efb4f3f180131e25c529ca662e81fd38ba
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -92,7 +114,8 @@ entries:
       name: postgresql
       repository: https://charts.bitnami.com/bitnami
       version: 11.1.17
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: 55d034bf2bea592cac8bbcde8a21efe3d2c128fd7ad9574d7c676dafb2e0b49b
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -109,7 +132,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.42.3
     created: "2022-03-30T06:05:33.806144344Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: 94fe887128fcaa15e58d46aa7d8a2acd6176be734e5b4d99f75ed8ffa9ee0cfa
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -125,7 +149,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.41.6
     created: "2022-03-22T11:23:04.083367839Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: 6fd8b6aa000936a08564307ce6e26a3756461dc177100c3256693c5e827a375b
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -141,7 +166,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.41.6
     created: "2022-03-03T13:50:43.019527712Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: 9e963e42f8f86a9c2000f69c8afc31dbfb45a411702d91b7a36d43de861412aa
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -157,7 +183,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.41.6
     created: "2022-02-21T17:47:36.216623317Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: f16f554cef3c73ed0205e344385e30b4df0ea411dbb2a81cea9cf3ca5a365c38
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -173,7 +200,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.41.6
     created: "2022-02-09T01:58:09.976540018Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: 14c2cf598ffdc729f68a4f66db23fe61ba836ef1991de9698b5e7ebe07e667db
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -189,7 +217,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.41.5
     created: "2022-01-06T02:49:15.735435761Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: bda75646c136c1266857944c2ada5ef04b1ca8162f2546a53cc42e4c83700565
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -205,7 +234,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.41.5
     created: "2021-12-20T03:35:41.586010745Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: 77879acd5723c57dae3356196bf395871bf455b0575e02fbc573e4ac74c85305
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -221,7 +251,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.41.4
     created: "2021-12-14T15:15:45.333032308Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: 2fcefcd76450d3d2e91034f8c95e164996c387db2ef4010cb31579039ec40362
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -237,7 +268,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.41.0
     created: "2021-11-08T03:57:22.589094666Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: dcc1b0467b1530ae8f48470d2b92c4d148fc7329ac2004c63485c31c8ec0e30a
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -253,7 +285,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.41.0
     created: "2021-10-15T01:57:59.252986283Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: c8de1cc4f291a13aa088df72fe3ee4c0d7d46337546461f254255b00df1a5e63
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -269,7 +302,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.39.3
     created: "2021-10-11T14:13:19.316589629Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: 5cd484368c97588f8fddbd6dd20658cd3f796a955e1965145599fecb82a7032c
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -285,7 +319,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.39.3
     created: "2021-10-11T10:00:27.236015211Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: d4546def012ffab7743457c38b5d909a7c349d23ce3230f5dfc40dad73e40779
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -301,7 +336,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.39.3
     created: "2021-10-07T01:50:10.785215112Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: 95ecf1f333c3da85207643915a2eebb65590e38e6691181915b4de18a58648d9
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -317,7 +353,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.39.3
     created: "2021-09-11T03:03:28.68793277Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: 61d6f448e2bba1a4d6d1a0e366aa33f3517ab575063e7d88f155f3e9c38d2ed4
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -333,7 +370,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.39.3
     created: "2021-08-18T03:26:46.803997201Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: dc948b53846fbff59b14cc26d92949fdd42364cd6bcfc5f8b5929bb3a9287dcb
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -349,7 +387,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.39.3
     created: "2021-08-13T03:01:00.185360988Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: debc87a6e42bb246228306c59a7188ca2c0692548a38e0b9c2d4fefa18ac6b56
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -365,7 +404,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.39.3
     created: "2021-07-01T13:07:18.742002776Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: 26785d47d17f4dc7ae53a25cbc4cd8b629816bac8ff116dd8b4e1ab0cae2aeec
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -381,7 +421,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.39.3
     created: "2021-07-01T12:56:08.950002197Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: f0d2d11483b2cfcdad5773866c235e951d0a9f30db82e93f8db5289ede29335f
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -397,7 +438,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.39.3
     created: "2021-06-17T04:33:39.194223525Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: e7f57bdaa60c79ebfc12b37ad82bbca65842f09a9738c95daa66aa5a67dcc20e
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -413,7 +455,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.36.3
     created: "2021-04-14T03:21:40.713382354Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: 02fa10b12d5a61bf3528045c22375a15e76552a3eccbbc981ab689185991c2ae
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -429,7 +472,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.36.3
     created: "2021-04-13T05:05:54.872497261Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: ecf5313834b9e579fe1c4b15179f8b2596c6bd25c31c9b72e0352826ca4a486a
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -445,7 +489,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.36.3
     created: "2020-11-10T14:17:11.112251781Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: 8391a64b908c30c3e6e5a8426f34929bf6af580bd6831657bc4578618342e259
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -461,7 +506,8 @@ entries:
   - apiVersion: v1
     appVersion: v0.36.3
     created: "2020-11-10T13:10:51.634176036Z"
-    description: The easy, open source way for everyone in your company to ask questions and learn from data.
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
     digest: c0b2e4caedb097f26f6fc37370657e9d793bf81a6fe5166c0fee85e0b4715dcc
     home: http://www.metabase.com/
     icon: http://www.metabase.com/images/logo.svg
@@ -487,4 +533,4 @@ entries:
     urls:
     - https://github.com/lop3z/helm-charts/releases/download/wireguard-0.4.0/wireguard-0.4.0.tgz
     version: 0.4.0
-generated: "2020-11-10T13:10:51.457964191Z"
+generated: "2023-02-02T07:24:08.065979638Z"
