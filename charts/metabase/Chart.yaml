@@ -10,7 +10,7 @@ maintainers:
     email: phamminhthanh69@gmail.com
 dependencies:
   - name: postgresql
-    version: 11.1.17
+    version: 11.9.13
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled
 home: http://www.metabase.com/
