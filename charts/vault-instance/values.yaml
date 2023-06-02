@@ -1,0 +1,37 @@
+bankVaultsImage: ghcr.io/banzaicloud/bank-vaults:1.15.3
+
+existingTlsSecretName: ""
+
+image: vault:1.10.3
+
+ingress:
+  enabled: true
+  annotations: {}
+  spec:
+    rules:
+      - host: vault.does.not.exist
+        http:
+          paths:
+          - backend:
+              service:
+                name: vault
+                port:
+                  number: 8200
+            path: /
+            pathType: ImplementationSpecific
+
+istio:
+  enabled: false
+
+size: 1
+
+auth:
+  namespaces:
+  - secret-infra
+
+pvc:
+  storageClassName:
+  size: 1Gi
+
+# example "default"
+customAuthRole: ""
