@@ -14,7 +14,7 @@ spec:
   # Vault Pods , Services and TLS Secret annotations
   vaultAnnotations:
     type/instance: "vault"
-{{ toYaml .Values | trim | indent 4 }}
+{{ toYaml .Values.vaultAnnotations | trim | indent 4 }}
 
   # Vault Configurer Pods and Services annotations
   vaultConfigurerAnnotations:
