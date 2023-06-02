@@ -30,6 +30,7 @@ auth:
   - secret-infra
 
 pvc:
+  enabled: true
   storageClassName:
   size: 1Gi
 
