@@ -4,6 +4,9 @@ existingTlsSecretName: ""
 
 image: vault:1.10.3
 
+vaultAnnotations:
+  service.cilium.io/global: "true"
+
 ingress:
   enabled: true
   annotations: {}

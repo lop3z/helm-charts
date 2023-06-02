@@ -14,7 +14,7 @@ spec:
   # Vault Pods , Services and TLS Secret annotations
   vaultAnnotations:
     type/instance: "vault"
-    service.cilium.io/global: "true"
+{{ toYaml .Values | trim | indent 4 }}
 
   # Vault Configurer Pods and Services annotations
   vaultConfigurerAnnotations:
