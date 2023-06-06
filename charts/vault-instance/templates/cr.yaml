@@ -3,9 +3,9 @@ kind: "Vault"
 metadata:
   name: "vault"
 spec:
-  size: {{ .Values.size }}
-  image: {{ .Values.image }}
-  bankVaultsImage: {{ .Values.bankVaultsImage }}
+  # size: {{ .Values.size }}
+  # image: {{ .Values.image }}
+  # bankVaultsImage: {{ .Values.bankVaultsImage }}
 
   # Common annotations for all created resources
   annotations:
