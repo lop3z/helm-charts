@@ -3,7 +3,7 @@ kind: "Vault"
 metadata:
   name: "vault"
 spec:
-  # size: {{ .Values.size }}
+  size: {{ .Values.size }}
   # image: {{ .Values.image }}
   # bankVaultsImage: {{ .Values.bankVaultsImage }}
 
