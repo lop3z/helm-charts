@@ -1,8 +1,8 @@
-bankVaultsImage: ghcr.io/banzaicloud/bank-vaults:1.15.3
+bankVaultsImage: ghcr.io/banzaicloud/bank-vaults:latest
 
 existingTlsSecretName: ""
 
-image: vault:1.10.3
+image: vault:1.12
 
 vaultAnnotations:
   service.cilium.io/global: "true"
