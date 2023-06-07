@@ -91,7 +91,7 @@ spec:
   # Support for distributing the generated CA certificate Secret to other namespaces.
   # Define a list of namespaces or use ["*"] for all namespaces.
   caNamespaces:
-    - "vswh"
+    - "*"
 
   # Support for adding hostnames and IPs to the generated CA certificate.
   # tlsAdditionalHosts:
@@ -175,14 +175,14 @@ spec:
         configuration:
           config:
           - name: urls
-            issuing_certificates: https://vault.{{ .Release.Namespace }}":8200/v1/pki/ca
-            crl_distribution_points: https://vault.{{ .Release.Namespace }}":8200/v1/pki/crl
+            issuing_certificates: https://vault.{{ .Release.Namespace }}:8200/v1/pki/ca
+            crl_distribution_points: https://vault.{{ .Release.Namespace }}:8200/v1/pki/crl
           root/generate:
           - name: internal
-            common_name: vault.{{ .Release.Namespace }}"
+            common_name: vault.{{ .Release.Namespace }}
           roles:
           - name: default
-            allowed_domains: localhost,pod,svc,default,{{ .Release.Namespace }}"
+            allowed_domains: localhost,pod,svc,default,{{ .Release.Namespace }}
             allow_subdomains: true
             generate_lease: true
             ttl: 1m
@@ -252,16 +252,16 @@ spec:
     requests:
       storage: 1Gi
 
-# ---
-# apiVersion: v1
-# kind: PersistentVolume
-# metadata:
-#   name: vault-file
-# spec:
-#   capacity:
-#     storage: 1Gi
-#   accessModes:
-#   - ReadWriteOnce
-#   persistentVolumeReclaimPolicy: Recycle
-#   hostPath:
-#     path: /vault/file
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: vault-file
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /vault/file
