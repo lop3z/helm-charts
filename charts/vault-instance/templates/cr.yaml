@@ -62,7 +62,7 @@ spec:
 
   # Specify existing secret contains TLS certificate (accepted secret type: kubernetes.io/tls)
   # If it is set, generating certificate will be disabled
-  existingTlsSecretName: vault-cert-tls
+  #existingTlsSecretName: vault-cert-tls
 
   # Specify threshold for renewing certificates. Valid time units are "ns", "us", "ms", "s", "m", "h".
   # tlsExpiryThreshold: 168h
