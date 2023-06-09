@@ -4,6 +4,7 @@ metadata:
   name: vault-selfsigned
 spec:
   selfSigned: {}
+
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -23,4 +24,3 @@ spec:
   secretName: vault-cert-tls
   issuerRef:
     name: vault-selfsigned
-EOF
