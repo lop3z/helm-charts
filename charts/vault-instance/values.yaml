@@ -2,7 +2,7 @@ bankVaultsImage: ghcr.io/banzaicloud/bank-vaults:latest
 
 existingTlsSecretName: ""
 
-image: vault:1.12
+image: hashicorp/vault:1.12
 
 vaultAnnotations:
   service.cilium.io/global: "true"
