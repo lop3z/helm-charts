@@ -26,11 +26,11 @@ ingress:
 istio:
   enabled: false
 
-size: 3
+size: 1
 
 auth:
   namespaces:
-  - secret-infra
+  - jx-vault
 
 pvc:
   enabled: true
@@ -39,3 +39,7 @@ pvc:
 
 # example "default"
 customAuthRole: ""
+
+# multi-dc config
+primary: false
+raftLeaderAddress: ""
