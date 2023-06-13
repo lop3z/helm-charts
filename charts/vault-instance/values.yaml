@@ -42,4 +42,4 @@ customAuthRole: ""
 
 # multi-dc config
 primary: false
-raftLeaderAddress: ""
+raftLeaderAddress: "vault-primary.jx-vault.svc.cluster.local"
