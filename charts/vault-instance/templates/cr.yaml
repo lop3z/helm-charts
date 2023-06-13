@@ -72,17 +72,6 @@ spec:
         resources:
           requests:
             storage: 1Gi
-    - metadata:
-        name: vault-file
-      spec:
-        # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#class-1
-        # storageClassName: ""
-        accessModes:
-          - ReadWriteOnce
-        persistentVolumeReclaimPolicy: Recycle
-        resources:
-          requests:
-            storage: 1Gi
   volumeMounts:
     - name: vault-file
       mountPath: /vault/file
@@ -264,30 +253,30 @@ spec:
   # Marks presence of Istio, which influences things like port namings
   istioEnabled: false
 
-# ---
-# apiVersion: v1
-# kind: PersistentVolumeClaim
-# metadata:
-#   name: vault-file
-# spec:
-#   # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#class-1
-#   # storageClassName: ""
-#   accessModes:
-#     - ReadWriteOnce
-#   resources:
-#     requests:
-#       storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vault-file
+spec:
+  # https://kubernetes.io/docs/concepts/storage/persistent-volumes/#class-1
+  # storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
 
-# ---
-# apiVersion: v1
-# kind: PersistentVolume
-# metadata:
-#   name: vault-file
-# spec:
-#   capacity:
-#     storage: 1Gi
-#   accessModes:
-#   - ReadWriteOnce
-#   persistentVolumeReclaimPolicy: Recycle
-#   hostPath:
-#     path: /vault/file
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: vault-file
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /vault/file
