@@ -193,20 +193,18 @@ spec:
     - name: VAULT_LOG_LEVEL
       value: debug
 
-{{- if .Values.primary }}
   # Use local disk to store Vault file data, see config section.
   volumes:
     - name: vault-file
       persistentVolumeClaim:
         claimName: vault-file
-{{- else }}
-  envsConfig:
-    - name: VAULT_RAFT_CACERT
-      value: /vault/raft-tls/ca.crt
-  volumes:
+{{- if not .Values.primary }}
     - name: vault-primary-tls
       secret:
         secretName: vault-primary-tls
+  envsConfig:
+    - name: VAULT_RAFT_CACERT
+      value: /vault/raft-tls/ca.crt
 
   bankVaultsVolumeMounts:
     - name: vault-primary-tls
