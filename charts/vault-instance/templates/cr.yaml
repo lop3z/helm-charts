@@ -84,7 +84,7 @@ spec:
     - "*"
 
   # Support for adding hostnames and IPs to the generated CA certificate.
-  tlsAdditionalHosts: |-
+  tlsAdditionalHosts:
     {{- range .Values.tlsAdditionalHosts }}
     - "{{ . }}.{{ $.Release.Namespace }}.svc.cluster.local"
     {{- end }} 
