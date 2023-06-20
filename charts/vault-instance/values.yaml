@@ -55,3 +55,4 @@ tlsAdditionalHosts:
 # multi-dc config
 primary: false
 raftLeaderAddress: "vault-primary.jx-vault.svc.cluster.local"
+secretTlsPrimaryName: "vault-primary-tls"

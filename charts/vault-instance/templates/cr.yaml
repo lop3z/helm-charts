@@ -193,18 +193,18 @@ spec:
     - name: VAULT_LOG_LEVEL
       value: debug
 
-{{- if not .Values.primary }}
-    - name: vault-primary-tls
-      secret:
-        secretName: vault-primary-tls
-  envsConfig:
-    - name: VAULT_RAFT_CACERT
-      value: /vault/raft-tls/ca.crt
+# {{- if not .Values.primary }}
+#     - name: vault-primary-tls
+#       secret:
+#         secretName: vault-primary-tls
+#   envsConfig:
+#     - name: VAULT_RAFT_CACERT
+#       value: /vault/raft-tls/ca.crt
 
-  bankVaultsVolumeMounts:
-    - name: vault-primary-tls
-      mountPath: /vault/raft-tls/
-{{- end }}
+#   bankVaultsVolumeMounts:
+#     - name: vault-primary-tls
+#       mountPath: /vault/raft-tls/
+# {{- end }}
   # Allows writing some secrets to Vault (useful for development purposes).
   # See https://www.vaultproject.io/docs/secrets/kv/index.html for more information.
   # startupSecrets:
