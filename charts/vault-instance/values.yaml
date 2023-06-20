@@ -1,5 +1,6 @@
 bankVaultsImage: ghcr.io/banzaicloud/bank-vaults:latest
 
+apiAddr: 'vault'
 existingTlsSecretName: ""
 
 image: hashicorp/vault:1.12
@@ -7,21 +8,21 @@ image: hashicorp/vault:1.12
 vaultAnnotations:
   service.cilium.io/global: "true"
 
-ingress:
-  enabled: true
-  annotations: {}
-  spec:
-    rules:
-      - host: vault.does.not.exist
-        http:
-          paths:
-          - backend:
-              service:
-                name: vault
-                port:
-                  number: 8200
-            path: /
-            pathType: ImplementationSpecific
+# ingress:
+#   enabled: true
+#   annotations: {}
+#   spec:
+#     rules:
+#       - host: vault.does.not.exist
+#         http:
+#           paths:
+#           - backend:
+#               service:
+#                 name: vault
+#                 port:
+#                   number: 8200
+#             path: /
+#             pathType: ImplementationSpecific
 
 istio:
   enabled: false
@@ -40,6 +41,17 @@ pvc:
 # example "default"
 customAuthRole: ""
 
+disable_mlock: false
+serviceRegistrationEnabled: true
+multiRegion:
+  - sgp1
+  - sbg5
+tlsAdditionalHosts:
+  - vault
+  - vault-sgp1
+  - vault-sgp1-0
+  - vault-sbg5
+  - vault-sbg5-0
 # multi-dc config
 primary: false
 raftLeaderAddress: "vault-primary.jx-vault.svc.cluster.local"
