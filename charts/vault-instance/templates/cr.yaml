@@ -77,10 +77,10 @@ spec:
       mountPath: /vault/file
 {{- if not .Values.primary }}
   bankVaultsVolumeMounts:
-    - name: vault-tls
+    - name: vault-raft-tls
       mountPath: /vault/raft-tls/
   volumes:
-    - name: vault-tls
+    - name: vault-raft-tls
       secret:
         secretName: vault-tls
   envsConfig:
