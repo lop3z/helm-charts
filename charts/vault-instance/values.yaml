@@ -44,15 +44,11 @@ customAuthRole: ""
 disable_mlock: false
 serviceRegistrationEnabled: true
 multiRegion:
-  - sgp1
-  - sbg5
-tlsAdditionalHosts:
-  - vault
-  - vault-sgp1
-  - vault-sgp1-0
-  - vault-sbg5
-  - vault-sbg5-0
+  # - sgp1
+  # - sbg5
+tlsAdditionalHosts: []
 # multi-dc config
 primary: false
 raftLeaderAddress: "vault-primary.jx-vault.svc.cluster.local"
 secretTlsPrimaryName: "vault-primary-tls"
+logLevel: info
