@@ -39,10 +39,10 @@ spec:
 
   # Specify existing secret contains TLS certificate (accepted secret type: kubernetes.io/tls)
   # If it is set, generating certificate will be disabled
-  {{- if and .Values.existingTlsSecretName }}
-  existingTlsSecretName: {{ .Values.existingTlsSecretName }}
-  #existingTlsSecretName: vault-cert-tls
-  {{- end }}
+  # {{- if and .Values.existingTlsSecretName }}
+  # existingTlsSecretName: {{ .Values.existingTlsSecretName }}
+  # #existingTlsSecretName: vault-cert-tls
+  # {{- end }}
   # Specify threshold for renewing certificates. Valid time units are "ns", "us", "ms", "s", "m", "h".
   # tlsExpiryThreshold: 168h
 
@@ -137,7 +137,7 @@ spec:
 
     auth:
       - type: kubernetes
-        path: /kubernetes-sgp1
+        path: /sgp1
         roles:
           # Allow every pod in the default namespace to use the secret kv store
           - name: default
@@ -151,7 +151,7 @@ spec:
             policies: ["allow_secrets", "allow_pki"]
             ttl: 1h
       - type: kubernetes
-        path: /kubernetes-sbg5
+        path: /sbg5
         roles:
           # Allow every pod in the default namespace to use the secret kv store
           - name: default
@@ -194,18 +194,18 @@ spec:
     - name: VAULT_LOG_LEVEL
       value: debug
 
-# {{- if not .Values.primary }}
-#     - name: vault-primary-tls
-#       secret:
-#         secretName: vault-primary-tls
-#   envsConfig:
-#     - name: VAULT_RAFT_CACERT
-#       value: /vault/raft-tls/ca.crt
+{{- if not .Values.primary }}
+    - name: vault-tls
+      secret:
+        secretName: vault-tls
+  envsConfig:
+    - name: VAULT_RAFT_CACERT
+      value: /vault/raft-tls/ca.crt
 
-#   bankVaultsVolumeMounts:
-#     - name: vault-primary-tls
-#       mountPath: /vault/raft-tls/
-# {{- end }}
+  bankVaultsVolumeMounts:
+    - name: vault-tls
+      mountPath: /vault/raft-tls/
+{{- end }}
   # Allows writing some secrets to Vault (useful for development purposes).
   # See https://www.vaultproject.io/docs/secrets/kv/index.html for more information.
   # startupSecrets:
