@@ -75,7 +75,18 @@ spec:
   volumeMounts:
     - name: vault-raft
       mountPath: /vault/file
-
+{{- if not .Values.primary }}
+  bankVaultsVolumeMounts:
+    - name: vault-tls
+      mountPath: /vault/raft-tls/
+  volumes:
+    - name: vault-tls
+      secret:
+        secretName: vault-tls
+  envsConfig:
+    - name: VAULT_RAFT_CACERT
+      value: /vault/raft-tls/ca.crt
+{{- end }}
   veleroEnabled: false
 
   # Support for distributing the generated CA certificate Secret to other namespaces.
@@ -194,18 +205,7 @@ spec:
     - name: VAULT_LOG_LEVEL
       value: debug
 
-{{- if not .Values.primary }}
-    - name: vault-tls
-      secret:
-        secretName: vault-tls
-  envsConfig:
-    - name: VAULT_RAFT_CACERT
-      value: /vault/raft-tls/ca.crt
 
-  bankVaultsVolumeMounts:
-    - name: vault-tls
-      mountPath: /vault/raft-tls/
-{{- end }}
   # Allows writing some secrets to Vault (useful for development purposes).
   # See https://www.vaultproject.io/docs/secrets/kv/index.html for more information.
   # startupSecrets:
