@@ -86,7 +86,7 @@ spec:
     - IPv4
   ipFamilyPolicy: SingleStack
   internalTrafficPolicy: Cluster
-{{- range $i := until ($.Values.size | int) }}
+{{- range $i := until 3 }}
 ---
 apiVersion: v1
 kind: Service

@@ -4,6 +4,7 @@
 
 # Variables
 
+> max nb instances per region = 3 
 ## PRIMARY
 `cluster_primary_region`: sgp1
 
@@ -52,9 +53,6 @@ kubectl -n jx-vault get secrets vault-sgp1-tls -o json | jq 'del(.metadata.owner
 ## Secondary instance
 
 
-
-
-
 - unseal secret will be generate automatically, you will find unseal keys and root token in the secret name `vault-primary-unseal-keys`, this secret must be copied to all cluster
 
 ```
@@ -100,7 +98,7 @@ chart: lop3z/vault-instance
 
 1. for each cluster, create a service account token
 ```
-kubectl apply -f - <<EOF
+kubectl -n jx-vault apply -f - <<EOF
 apiVersion: v1
 kind: Secret
 metadata:
