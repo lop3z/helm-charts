@@ -96,8 +96,8 @@ metadata:
   labels:
     app.kubernetes.io/name: vault
     example.com/log-format: json
-    global_service: 'true'
-    vault_cr: vault-{{ $region }}-{{ . }}
+    statefulset.kubernetes.io/pod-name: "vault-{{ $region }}-{{ . }}"
+    vault_cr: vault-{{ $region }}
   annotations:
     common/annotation: 'true'
     service.cilium.io/global: 'true'
@@ -122,8 +122,8 @@ spec:
       targetPort: 9102
   selector:
     app.kubernetes.io/name: vault
-    vault-active: 'true'
-    vault_cr: "vault-{{ $region }}-{{ . }}"
+    vault_cr: vault-{{ $region }}
+    statefulset.kubernetes.io/pod-name: "vault-{{ $region }}-{{ . }}"
   type: ClusterIP
   sessionAffinity: None
   publishNotReadyAddresses: true
