@@ -97,8 +97,10 @@ spec:
   # Support for adding hostnames and IPs to the generated CA certificate.
   tlsAdditionalHosts:
     - vault-{{ .Release.Namespace }}.svc.cluster.local"
-    {{- range .Values.tlsAdditionalHosts }}
-    - "{{ . }}.{{ $.Release.Namespace }}.svc.cluster.local"
+    {{- range $key, $region :=  .Values.multiRegion }}
+    {{- range $i := until 3 }}
+    - "vault-{{ $region }}-{{ . }}.{{ $.Release.Namespace }}.svc.cluster.local"
+    {{- end }} 
     {{- end }} 
 
   # Describe where you would like to store the Vault unseal keys and root token.
