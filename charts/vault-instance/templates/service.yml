@@ -33,7 +33,6 @@ spec:
       targetPort: 9102
   selector:
     app.kubernetes.io/name: vault
-    vault-active: 'true'
   type: ClusterIP
   sessionAffinity: None
   ipFamilies:
@@ -77,7 +76,6 @@ spec:
       targetPort: 9102
   selector:
     app.kubernetes.io/name: vault
-    vault-active: 'true'
     vault_cr: vault-{{ $region }}
   type: ClusterIP
   sessionAffinity: None

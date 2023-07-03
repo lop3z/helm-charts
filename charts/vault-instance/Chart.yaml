@@ -1,7 +1,7 @@
 apiVersion: v1
 name: vault-instance
 description: a chart for creating a Vault instance via the vault operator
-version: 1.3.3
+version: 1.3.4
 appVersion: v1.0.0
 keywords:
   - vault
