@@ -96,7 +96,7 @@ spec:
 
   # Support for adding hostnames and IPs to the generated CA certificate.
   tlsAdditionalHosts:
-    - vault-{{ .Release.Namespace }}.svc.cluster.local
+    - vault.{{ .Release.Namespace }}.svc.cluster.local
     {{- range $key, $region :=  .Values.multiRegion }}
     {{- range $i := until 3 }}
     - "vault-{{ $region }}-{{ . }}.{{ $.Release.Namespace }}.svc.cluster.local"
