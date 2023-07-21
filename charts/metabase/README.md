@@ -52,12 +52,15 @@ The following table lists the configurable parameters of the Metabase chart and 
 | Parameter                                       | Description                                                                | Default           |
 |-------------------------------------------------|----------------------------------------------------------------------------|-------------------|
 | replicaCount                                    | desired number of controller pods                                          | 1                 |
+| pdb.create                                      | Enable/disable a Pod Disruption Budget creation                            | false             |
+| pdb.minAvailable                                | Minimum number/percentage of pods that should remain scheduled             | 1                 |
+| pdb.maxUnavailable                              | Maximum number/percentage of pods that may be made unavailable             |                   |
 | deploymentAnnotations                           | extra deployment annotations                                               | {}                |
 | deploymentLabels                                | extra deployment labels                                                    | {}                |
 | podAnnotations                                  | controller pods annotations                                                | {}                |
 | podLabels                                       | extra pods labels                                                          | {}                |
 | image.repository                                | controller container image repository                                      | metabase/metabase |
-| image.tag                                       | controller container image tag                                             | v0.41.6           |
+| image.tag                                       | controller container image tag                                             | v0.46.4           |
 | image.command                                   | controller container image command                                         | []                |
 | image.pullPolicy                                | controller container image pull policy                                     | IfNotPresent      |
 | image.pullSecrets                               | controller container image pull secrets                                    | []                |
