@@ -40,8 +40,8 @@ pvc:
 
 # example "default"
 customAuthRole: ""
-
-disable_mlock: false
+# https://developer.hashicorp.com/vault/docs/configuration/storage/raft
+disable_mlock: true
 serviceRegistrationEnabled: true
 multiRegion:
   # - sgp1

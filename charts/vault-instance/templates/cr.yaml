@@ -243,6 +243,12 @@ spec:
   #     hostnames:
   #     - "vault.local"
 
+  vaultContainerSpec:
+    name: ''
+    resources:
+      limits:
+        cpu: '1'
+        memory: 1Gi
   # It is possible to override the Vault container directly:
   # vaultContainerSpec:
   #   lifecycle:
