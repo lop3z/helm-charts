@@ -25,21 +25,6 @@
   name: vault-${cluster_primary_region}
   values:
   - primary: true
-  - multiRegion:
-    - ${cluster_primary_region}
-    - ${cluster_secondary_region_1}
-    - ${cluster_secondary_region_2}
-  - size: ${cluster_primary_region_nb_instance}
-  - image: vault:1.6.2
-  - tlsAdditionalHosts:
-    - vault-${cluster_primary_region}
-    - vault-${cluster_primary_region}-0
-    - vault-${cluster_primary_region}-1
-    - vault-${cluster_secondary_region_1}
-    - vault-${cluster_secondary_region_1}-0
-    - vault-${cluster_secondary_region_2}
-    - vault-${cluster_secondary_region_2}-0
-    - vault-${cluster_secondary_region_2}-1
 ```
 
 2. on kubernetes, check the namespace `jx-vault` and get the secret `vault-${cluster_primary_region}-tls`, this secret must be copy to all cluster, to allow raft cluster authentication.
@@ -70,21 +55,6 @@ chart: lop3z/vault-instance
   values:
   - primary: false
   - raftLeaderAddress: "vault-${cluster_primary_region}.jx-vault.svc.cluster.local"
-  - multiRegion:
-    - ${cluster_primary_region}
-    - ${cluster_secondary_region_1}
-    - ${cluster_secondary_region_2}
-  - size: ${cluster_secondary_region_1_nb_instance}
-  - image: vault:1.6.2
-  - tlsAdditionalHosts:
-    - vault-${cluster_primary_region}
-    - vault-${cluster_primary_region}-0
-    - vault-${cluster_primary_region}-1
-    - vault-${cluster_secondary_region_1}
-    - vault-${cluster_secondary_region_1}-0
-    - vault-${cluster_secondary_region_2}
-    - vault-${cluster_secondary_region_2}-0
-    - vault-${cluster_secondary_region_2}-1
 ```
 
 2. Copy the secret `vault-unseal-keys` and `vault-${cluster_primary_region}-tls` to the secondary instances
