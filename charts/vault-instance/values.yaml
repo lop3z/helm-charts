@@ -5,6 +5,8 @@ existingTlsSecretName: ""
 
 image: hashicorp/vault:1.14
 
+affinity: {}
+
 vaultAnnotations:
   service.cilium.io/global: "true"
 

@@ -7,11 +7,11 @@ spec:
   image: {{ .Values.image }}
   # specify a custom bank-vaults image with bankVaultsImage:
   # bankVaultsImage: ghcr.io/banzaicloud/bank-vaults:latest
-
   # Common annotations for all created resources
   annotations:
     common/annotation: "true"
-
+  affinity:
+{{ toYaml .Values.affinity | indent 4 }}    
   # Vault Pods , Services and TLS Secret annotations
   vaultAnnotations:
     type/instance: "vault"
