@@ -8,7 +8,6 @@ image: hashicorp/vault:1.14
 affinity: {}
 
 vaultAnnotations:
-  service.cilium.io/global: "true"
 
 # ingress:
 #   enabled: true
@@ -29,7 +28,7 @@ vaultAnnotations:
 istio:
   enabled: false
 
-size: 1
+size: 3
 
 auth:
   namespaces:
@@ -38,7 +37,7 @@ auth:
 pvc:
   enabled: true
   storageClassName:
-  size: 1Gi
+  size: 3Gi
 
 # example "default"
 customAuthRole: ""
@@ -50,7 +49,7 @@ multiRegion:
   # - sbg5
 tlsAdditionalHosts: []
 # multi-dc config
-primary: false
+primary: true
 raftLeaderAddress: "vault-primary.jx-vault.svc.cluster.local"
 secretTlsPrimaryName: "vault-primary-tls"
 logLevel: info

@@ -15,8 +15,9 @@ spec:
   # Vault Pods , Services and TLS Secret annotations
   vaultAnnotations:
     type/instance: "vault"
-{{ toYaml .Values.vaultAnnotations | trim | indent 4 }}
-
+{{- if .Values.vaultAnnotations }}
+{{ toYaml .Values.vaultAnnotations | indent 4 }}
+{{- end }}
   # Vault Configurer Pods and Services annotations
   vaultConfigurerAnnotations:
     type/instance: "vaultconfigurer"
@@ -35,7 +36,7 @@ spec:
   # Specify the Service's type where the Vault Service is exposed
   # Please note that some Ingress controllers like https://github.com/kubernetes/ingress-gce
   # forces you to expose your Service on a NodePort
-  serviceType: ClusterIP
+  serviceType: NodePort
 
   # Specify existing secret contains TLS certificate (accepted secret type: kubernetes.io/tls)
   # If it is set, generating certificate will be disabled
@@ -95,13 +96,13 @@ spec:
     - "*"
 
   # Support for adding hostnames and IPs to the generated CA certificate.
-  tlsAdditionalHosts:
-    - vault.{{ .Release.Namespace }}.svc.cluster.local
-    {{- range $key, $region :=  .Values.multiRegion }}
-    {{- range $i := until 3 }}
-    - "vault-{{ $region }}-{{ . }}.{{ $.Release.Namespace }}.svc.cluster.local"
-    {{- end }} 
-    {{- end }} 
+  # tlsAdditionalHosts:
+  #   - vault.{{ .Release.Namespace }}.svc.cluster.local
+  #   {{- range $key, $region :=  .Values.multiRegion }}
+  #   {{- range $i := until 3 }}
+  #   - "vault-{{ $region }}-{{ . }}.{{ $.Release.Namespace }}.svc.cluster.local"
+  #   {{- end }} 
+  #   {{- end }} 
 
   # Describe where you would like to store the Vault unseal keys and root token.
   unsealConfig:
