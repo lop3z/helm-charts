@@ -631,6 +631,20 @@ entries:
   vault-instance:
   - apiVersion: v1
     appVersion: v1.0.0
+    created: "2023-10-17T09:40:25.511269687Z"
+    description: a chart for creating a Vault instance via the vault operator
+    digest: 2c98b1263ea143bf4d55eb188c6f3ba66da54bdc85498f07ed52e545043c874a
+    home: https://github.com/jenkins-x-charts/vault-instance
+    keywords:
+    - vault
+    name: vault-instance
+    sources:
+    - https://github.com/jenkins-x-charts/vault-instance
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/vault-instance-1.4.1/vault-instance-1.4.1.tgz
+    version: 1.4.1
+  - apiVersion: v1
+    appVersion: v1.0.0
     created: "2023-09-28T08:33:27.96607956Z"
     description: a chart for creating a Vault instance via the vault operator
     digest: b65f81c09b86a395a7341d8bff828fb7ece4cc3f480614589c15a9fbfa18aa7c
@@ -1272,4 +1286,4 @@ entries:
     urls:
     - https://github.com/lop3z/helm-charts/releases/download/wireguard-0.4.0/wireguard-0.4.0.tgz
     version: 0.4.0
-generated: "2023-09-28T08:33:27.966522881Z"
+generated: "2023-10-17T09:40:25.512110998Z"
