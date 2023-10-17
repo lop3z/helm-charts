@@ -48,15 +48,17 @@ spec:
   # tlsExpiryThreshold: 168h
 
   # # Request an Ingress controller with the default configuration
-  # ingress:
-  #   # Specify Ingress object annotations here, if TLS is enabled (which is by default)
-  #   # the operator will add NGINX, Traefik and HAProxy Ingress compatible annotations
-  #   # to support TLS backends
-  #   annotations: {}
-  #   # Override the default Ingress specification here
-  #   # This follows the same format as the standard Kubernetes Ingress
-  #   # See: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#ingressspec-v1beta1-extensions
-  #   spec: {}
+  ingress:
+    # Specify Ingress object annotations here, if TLS is enabled (which is by default)
+    # the operator will add NGINX, Traefik and HAProxy Ingress compatible annotations
+    # to support TLS backends
+    hostName: "vault-{{ .Release.Namespace }}.{{ .Values.jxRequirements.ingress.domain }}"
+    annotations:
+    {{- toYaml .Values.jxRequirements.ingress.annotations | indent 6 }}
+    # Override the default Ingress specification here
+    # This follows the same format as the standard Kubernetes Ingress
+    # See: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#ingressspec-v1beta1-extensions
+    spec: {}
   {{- if .Values.primary }}
   raftLeaderAddress: self
   {{- else }}
