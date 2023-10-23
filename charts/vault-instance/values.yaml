@@ -53,3 +53,8 @@ primary: true
 raftLeaderAddress: "vault-primary.jx-vault.svc.cluster.local"
 secretTlsPrimaryName: "vault-primary-tls"
 logLevel: info
+
+##
+jxRequirements:
+  ingress:
+    annotations: {}
