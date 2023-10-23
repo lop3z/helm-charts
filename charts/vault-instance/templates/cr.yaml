@@ -36,7 +36,7 @@ spec:
   # Specify the Service's type where the Vault Service is exposed
   # Please note that some Ingress controllers like https://github.com/kubernetes/ingress-gce
   # forces you to expose your Service on a NodePort
-  serviceType: NodePort
+  serviceType: ClusterIP
 
   # Specify existing secret contains TLS certificate (accepted secret type: kubernetes.io/tls)
   # If it is set, generating certificate will be disabled
