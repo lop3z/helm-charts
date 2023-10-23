@@ -60,16 +60,16 @@ spec:
     # See: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#ingressspec-v1beta1-extensions
     spec:
       rules:
-      - host: "vault-{{ .Release.Namespace }}.{{ .Values.jxRequirements.ingress.domain }}"
-        http:
-          paths:
-            path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: vault
-                port:
-                  number: 8200
+        - host: "vault-{{ .Release.Namespace }}.{{ .Values.jxRequirements.ingress.domain }}"
+          http:
+            paths:
+              - path: /
+                pathType: Prefix
+                backend:
+                  service:
+                    name: vault
+                    port:
+                      number: 8200
 
   {{- if .Values.primary }}
   raftLeaderAddress: self
@@ -110,8 +110,8 @@ spec:
     - "*"
 
   # Support for adding hostnames and IPs to the generated CA certificate.
-  # tlsAdditionalHosts:
-  #   - vault.{{ .Release.Namespace }}.svc.cluster.local
+  tlsAdditionalHosts:
+    - "vault-{{ .Release.Namespace }}.{{ .Values.jxRequirements.ingress.domain }}"
   #   {{- range $key, $region :=  .Values.multiRegion }}
   #   {{- range $i := until 3 }}
   #   - "vault-{{ $region }}-{{ . }}.{{ $.Release.Namespace }}.svc.cluster.local"
