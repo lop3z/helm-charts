@@ -1,69 +1,3 @@
-# How to initialize vault ha raft cluster with cilium
-- install helm `vault_operator` from https://kubernetes-charts.banzaicloud.com
-- install helm `vault-instance` chart from https://github.com/lop3z/helm-charts
-
-# Variables
-
-> max nb instances per region = 3 
-## PRIMARY
-`cluster_primary_region`: sgp1
-
-`cluster_primary_region_nb_instance`: 2
-## SECONDARY
-`cluster_secondary_region_1`
-`cluster_secondary_region_1_nb_instance`: 1
-`cluster_secondary_region_2`
-`cluster_secondary_region_2_nb_instance`: 2
-
-# Installation
-## Primary instance
-1. install the __primary vault__, set the helm release name to 
-`vault-${cluster_primary_region}` it will be installed into the region SGP1 with this helm values: 
-
-```yaml
-- chart: lop3z/vault-instance
-  name: vault-${cluster_primary_region}
-  values:
-  - primary: true
-```
-
-2. on kubernetes, check the namespace `jx-vault` and get the secret `vault-${cluster_primary_region}-tls`, this secret must be copy to all cluster, to allow raft cluster authentication.
-
-```
-kubectl -n jx-vault get secrets vault-sgp1-tls -o json | jq 'del(.metadata.ownerReferences)' | jq 'del(.metadata.resourceVersion)' | jq 'del(.metadata.uid)' | jq '.metadata.name = "vault-tls"' > vault-tls.json
-```` 
-
-3. Copy the secret `vault-unseal-keys` this secret must be copy to all cluster, to be able to unseal the vault
-
-## Secondary instance
-
-
-- unseal secret will be generate automatically, you will find unseal keys and root token in the secret name `vault-primary-unseal-keys`, this secret must be copied to all cluster
-
-```
-kubectl -n jx-vault get secrets vault-unseal-keys -o json | jq 'del(.metadata.ownerReferences)' | jq 'del(.metadata.resourceVersion)' | jq 'del(.metadata.uid)' > vault-unseal-keys.json
-````
-
-## Secondary instances
-
-1. Install secondary vault instance with these helm values 
-
-```yaml
-
-chart: lop3z/vault-instance
-  name: vault-${cluster_primary_region}
-  values:
-  - primary: false
-  - raftLeaderAddress: "vault-${cluster_primary_region}.jx-vault.svc.cluster.local"
-```
-
-2. Copy the secret `vault-unseal-keys` and `vault-${cluster_primary_region}-tls` to the secondary instances
-
-`kubectl -n jx-vault apply -f vault-tls.json`
-
-`kubectl -n jx-vault apply -f vault-unseal-keys.json`
-
-
 # VAULT
 
 1. for each cluster, create a service account token
@@ -74,8 +8,22 @@ kind: Secret
 metadata:
   name: vault-k8s-auth-secret
   annotations:
-    kubernetes.io/service-account.name: vault
+    kubernetes.io/service-account.name: vault-secrets-webhook
 type: kubernetes.io/service-account-token
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: vault-auth-delegator
+subjects:
+  - kind: ServiceAccount
+    name: vault-secrets-webhook
+    namespace: jx-vault
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:auth-delegator
 EOF
 ```
 
