@@ -1,7 +1,3 @@
-# Currently Metabase is not horizontly scalable. See
-# https://github.com/metabase/metabase/issues/1446 and
-# https://github.com/metabase/metabase/issues/2754
-# NOTE: Should remain 1
 replicaCount: 1
 
 pdb:
@@ -15,7 +11,7 @@ podAnnotations: {}
 podLabels: {}
 image:
   repository: metabase/metabase
-  tag: v0.46.6.2
+  tag: v0.47.2
   command: []
   pullPolicy: IfNotPresent
   pullSecrets: []
@@ -31,7 +27,10 @@ listen:
 
 monitoring:
   enabled: false
+  serviceMonitor:
+    enabled: false
   port: 9191
+
 ssl:
   # If you have an ssl certificate and would prefer to have Metabase run over HTTPS
   enabled: false
@@ -156,6 +155,9 @@ service:
     {}
     # Used to add custom annotations to the Service.
     # service.beta.kubernetes.io/aws-load-balancer-internal: "0.0.0.0/0"
+  loadBalancerSourceRanges:
+    {}
+
 ingress:
   enabled: false
   # The ingress class name, if you use multiple ingress controllers:
@@ -274,3 +276,9 @@ extraEnv: {}
 #      configMapKeyRef:
 #        name: metabase
 #        key: email
+
+envFrom: []
+  # - type: secret
+  #   name: metabase-secret
+  # - type: configMap
+  #   name: metabase-cm
