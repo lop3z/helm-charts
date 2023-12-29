@@ -85,6 +85,8 @@ database:
     # sidecarImageTag: latest
     ## ref: https://cloud.google.com/sql/docs/postgres/connect-kubernetes-engine#running_the_as_a_sidecar
     resources: {}
+    securityContext:
+      runAsNonRoot: true
 
 password:
   # Changing Metabase password complexity:
@@ -282,3 +284,21 @@ envFrom: []
   #   name: metabase-secret
   # - type: configMap
   #   name: metabase-cm
+
+securityContext: {}
+
+sidecars: []
+  # - name: busybox
+  #   image: busybox
+  #   ports:
+  #     - containerPort: 80
+  #       name: http
+  #   resources:
+  #     requests:
+  #       memory: 100Mi
+  #       cpu: 10m
+  #     limits:
+  #       memory: 100Mi
+  #       cpu: 10m
+  #   command: ["/bin/sh"]
+  #   args: ["-c", "while true; do echo hello; sleep 10;done"]

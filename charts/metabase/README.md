@@ -50,7 +50,7 @@ The command removes all the Kubernetes components associated with the chart and 
 The following table lists the configurable parameters of the Metabase chart and their default values.
 
 | Parameter                                       | Description                                                                | Default           |
-| ----------------------------------------------- | -------------------------------------------------------------------------- | ----------------- |
+|-------------------------------------------------|----------------------------------------------------------------------------|-------------------|
 | replicaCount                                    | desired number of controller pods                                          | 1                 |
 | pdb.create                                      | Enable/disable a Pod Disruption Budget creation                            | false             |
 | pdb.minAvailable                                | Minimum number/percentage of pods that should remain scheduled             | 1                 |
@@ -60,7 +60,7 @@ The following table lists the configurable parameters of the Metabase chart and 
 | podAnnotations                                  | controller pods annotations                                                | {}                |
 | podLabels                                       | extra pods labels                                                          | {}                |
 | image.repository                                | controller container image repository                                      | metabase/metabase |
-| image.tag                                       | controller container image tag                                             | v0.47.2         |
+| image.tag                                       | controller container image tag                                             | v0.47.2           |
 | image.command                                   | controller container image command                                         | []                |
 | image.pullPolicy                                | controller container image pull policy                                     | IfNotPresent      |
 | image.pullSecrets                               | controller container image pull secrets                                    | []                |
@@ -69,6 +69,7 @@ The following table lists the configurable parameters of the Metabase chart and 
 | listen.port                                     | Listening on a specific network port                                       | 3000              |
 | monitoring.enabled                              | Enable prometheus endpoint                                                 | false             |
 | monitoring.port                                 | Listening port for prometheus endpoint                                     | 9191              |
+| monitoring.serviceMonitor.enabled               | Enable ServiceMonitor resource for prometheus scraping                     | false             |
 | ssl.enabled                                     | Enable SSL to run over HTTPS                                               | false             |
 | ssl.port                                        | SSL port                                                                   | null              |
 | ssl.keyStore                                    | The key store in JKS format                                                | null              |
@@ -90,6 +91,7 @@ The following table lists the configurable parameters of the Metabase chart and 
 | database.googleCloudSQL.instanceConnectionNames | Google Cloud SQL instance connection names. See `values.yaml` for details. | []                |
 | database.googleCloudSQL.sidecarImageTag         | Specific tag for the Google Cloud SQL Auth proxy sidecar image             | latest            |
 | database.googleCloudSQL.resources               | Google Cloud SQL Auth proxy resource requests and limits                   | {}                |
+| database.googleCloudSQL.securityContext         | Google Cloud SQL Security Context                                          | runAsNonRoot: true| 
 | password.complexity                             | Complexity requirement for Metabase account's password                     | normal            |
 | password.length                                 | Minimum length required for Metabase account's password                    | 6                 |
 | timeZone                                        | Service time zone                                                          | UTC               |
@@ -147,5 +149,7 @@ The following table lists the configurable parameters of the Metabase chart and 
 | session.sessionCookies                          | When browser is closed, user login session will expire                     | null              |
 | extraEnv                                        | Mapping of extra environment variables                                     | {}                |
 | envFrom                                         | Mapping of extra environment variables from secret and/or configMap        | []                |
+| sidecars                                        | Mapping of container sidecars for the main deployment                      | []                |
+| securityContext                                 | Security Context for the Metabase pod                                      | {}                | 
 
 The above parameters map to the env variables defined in [metabase](http://github.com/metabase/metabase). For more information please refer to the [metabase documentations](https://www.metabase.com/docs/v0.41/operations-guide/environment-variables.html).
