@@ -685,6 +685,20 @@ entries:
   pgbouncer:
   - apiVersion: v2
     appVersion: v1.21.0
+    created: "2024-01-29T15:42:44.565229612Z"
+    description: A Helm chart for Pgbouncer
+    digest: 443ae050c439e1cff3737492517e5c5255795cdc46d8077a9f813ed5107ec6fd
+    home: https://github.com/pmint93/helm-charts
+    maintainers:
+    - name: pmint93
+      url: https://github.com/pmint93
+    name: pgbouncer
+    type: application
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/pgbouncer-0.3.0/pgbouncer-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
+    appVersion: v1.21.0
     created: "2023-12-29T08:11:17.759367063Z"
     description: A Helm chart for Pgbouncer
     digest: fc23d6f3a8d724f7e540392e21b4814434c5977ba57ff4b8dc9b0234c3f0e800
@@ -1425,4 +1439,4 @@ entries:
     urls:
     - https://github.com/lop3z/helm-charts/releases/download/wireguard-0.4.0/wireguard-0.4.0.tgz
     version: 0.4.0
-generated: "2024-01-18T02:24:02.866427082Z"
+generated: "2024-01-29T15:42:44.565449002Z"
