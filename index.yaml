@@ -2,6 +2,24 @@ apiVersion: v1
 entries:
   metabase:
   - apiVersion: v1
+    appVersion: v0.48.3
+    created: "2024-02-12T01:12:24.389356561Z"
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
+    digest: 72e17c39e8b313f83df951e85cdd8b1eafbe489a97b2e5223cb13cd5ca8c52b0
+    home: http://www.metabase.com/
+    icon: http://www.metabase.com/images/logo.svg
+    maintainers:
+    - email: phamminhthanh69@gmail.com
+      name: pmint93
+    name: metabase
+    sources:
+    - https://github.com/metabase/metabase
+    - https://github.com/pmint93/helm-charts/metabase
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/metabase-2.11.0/metabase-2.11.0.tgz
+    version: 2.11.0
+  - apiVersion: v1
     appVersion: v0.47.2
     created: "2024-01-18T02:24:02.8659982Z"
     description: The easy, open source way for everyone in your company to ask questions
@@ -683,6 +701,20 @@ entries:
     - https://github.com/pmint93/helm-charts/releases/download/metabase-0.13.0/metabase-0.13.0.tgz
     version: 0.13.0
   pgbouncer:
+  - apiVersion: v2
+    appVersion: v1.21.0
+    created: "2024-02-12T01:12:24.486450467Z"
+    description: A Helm chart for Pgbouncer
+    digest: f0a3130bada3e4d3287062bfa92df8bac40a7fbe489f9887beace82e23596a35
+    home: https://github.com/pmint93/helm-charts
+    maintainers:
+    - name: pmint93
+      url: https://github.com/pmint93
+    name: pgbouncer
+    type: application
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/pgbouncer-0.5.1/pgbouncer-0.5.1.tgz
+    version: 0.5.1
   - apiVersion: v2
     appVersion: v1.21.0
     created: "2024-01-29T15:42:44.565229612Z"
@@ -1439,4 +1471,4 @@ entries:
     urls:
     - https://github.com/lop3z/helm-charts/releases/download/wireguard-0.4.0/wireguard-0.4.0.tgz
     version: 0.4.0
-generated: "2024-01-29T15:42:44.565449002Z"
+generated: "2024-02-12T01:12:24.486877896Z"
