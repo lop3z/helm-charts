@@ -60,6 +60,7 @@ The following table lists the configurable parameters of the chart and their def
 | imagePullSecrets                          | list      | `[]`                                                              | Container image pull secrets                                                                          |
 | nameOverride                              | string    | `""`                                                              | Override the name of release                                                                          |
 | fullnameOverride                          | string    | `""`                                                              | Override the fullname of release                                                                      |
+| deploymentAnnotations                     | object    | `{}`                                                              | Deployment's annotations                                                                              |
 | podAnnotations                            | object    | `{}`                                                              | Pod's annotations                                                                                     |
 | podSecurityContext                        | object    | `{}`                                                              | Security context settings for the pod                                                                 |
 | securityContext                           | object    | `{}`                                                              | Security context settings for the container                                                           |
@@ -72,8 +73,9 @@ The following table lists the configurable parameters of the chart and their def
 | affinity                                  | object    | `{}`                                                              | Affinity settings for pod assignment                                                                  |
 | serviceAccount                            | object    | `{enable: false}`                                                 | Service account's definition                                                                          |
 | serviceAccount.enable                     | bool      | `false`                                                           | Service account's section flag                                                                        |
-| serviceAccount.name                       | string    | `""`                                                              | Service account's name                                                                                |
+| serviceAccount.name                       | string    | `"pgbouncer"`                                                     | Service account's name                                                                                |
 | serviceAccount.annotations                | object    | `{}`                                                              | Service account's annotations                                                                         |
 | sidecars                                  | list      | `[]`                                                              | Sidecars raw definition                                                                               |
+| serviceAccount.existingServiceAccountName | string    | `""`                                                              | Do not create a KSA but use an existing one                                                           |
 
 To better understand PgBouncer configuration, please refer to [this document](https://www.pgbouncer.org/config.html)
