@@ -60,7 +60,7 @@ The following table lists the configurable parameters of the Metabase chart and 
 | podAnnotations                                  | controller pods annotations                                                | {}                |
 | podLabels                                       | extra pods labels                                                          | {}                |
 | image.repository                                | controller container image repository                                      | metabase/metabase |
-| image.tag                                       | controller container image tag                                             | v0.48.3           |
+| image.tag                                       | controller container image tag                                             | v0.49.3           |
 | image.command                                   | controller container image command                                         | []                |
 | image.pullPolicy                                | controller container image pull policy                                     | IfNotPresent      |
 | image.pullSecrets                               | controller container image pull secrets                                    | []                |
@@ -114,6 +114,7 @@ The following table lists the configurable parameters of the Metabase chart and 
 | service.internalPort                            | Service internal port, should be the same as `listen.port`                 | 3000              |
 | service.nodePort                                | Service node port                                                          | null              |
 | service.annotations                             | Service annotations                                                        | {}                |
+| service.labels                                  | Service labels                                                             | {}                |
 | serviceAccount.create                           | Specifies whether a service account should be created                      | false             |
 | serviceAccount.annotations                      | Annotations to add to the service account                                  | {}                |
 | serviceAccount.name                             | The name of the service account to use                                     | null              |
