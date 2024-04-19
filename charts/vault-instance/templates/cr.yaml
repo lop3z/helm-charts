@@ -102,7 +102,7 @@ spec:
     - name: VAULT_RAFT_CACERT
       value: /vault/raft-tls/ca.crt
 {{- end }}
-  veleroEnabled: false
+  veleroEnabled: true
 
   # Support for distributing the generated CA certificate Secret to other namespaces.
   # Define a list of namespaces or use ["*"] for all namespaces.
