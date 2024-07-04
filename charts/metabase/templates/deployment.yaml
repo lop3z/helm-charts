@@ -19,7 +19,9 @@ spec:
   selector:
     matchLabels:
       app: {{ template "metabase.name" . }}
+  {{ if not .Values.hpa.enabled }}
   replicas: {{ .Values.replicaCount }}
+  {{ end }}
   {{- with .Values.strategy }}
   strategy:
 {{ toYaml . | trim | indent 4 }}
@@ -301,10 +303,15 @@ spec:
       topologySpreadConstraints:
 {{ toYaml . | indent 8 }}
     {{- end }}
+    {{- with .Values.hostAliases }}
+      hostAliases:
+{{ toYaml . | indent 8 }}
+    {{- end }}
       {{- if .Values.priorityClass}}
-      priorityClass: {{ .Values.priorityClass }}
+      priorityClassName: {{ .Values.priorityClass }}
       {{- end }}
       serviceAccountName: {{ template "metabase.serviceAccountName" . }}
+      automountServiceAccountToken: {{ .Values.automountServiceAccountToken }}
       volumes:
         {{- if or .Values.log4jProperties .Values.log4j2XML }}
         - name: config
