@@ -261,7 +261,7 @@ spec:
   vaultContainerSpec:
     name: ''
 {{- if .Values.resources }}
-    resouces:
+    resources:
 {{ toYaml .Values.resources | indent 6}}
 {{- end }}
   # It is possible to override the Vault container directly:
