@@ -260,10 +260,10 @@ spec:
 
   vaultContainerSpec:
     name: ''
-    resources:
-      limits:
-        cpu: '1'
-        memory: 1Gi
+{{- if .Values.resources }}
+    resouces:
+{{ toYaml .Values.resources | indent 6}}
+{{- end }}
   # It is possible to override the Vault container directly:
   # vaultContainerSpec:
   #   lifecycle:
