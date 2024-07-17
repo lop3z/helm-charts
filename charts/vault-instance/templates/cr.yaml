@@ -3,6 +3,11 @@ kind: "Vault"
 metadata:
   name: "{{ .Release.Name }}"
 spec:
+  vaultConfigurerPodSpec:
+{{- if .Values.vaultConfigurer.resources }}
+    resources:
+{{ toYaml .Values.vaultConfigurer.resources | indent 6}}
+{{- end }}
   size: {{ .Values.size }}
   image: {{ .Values.image }}
   # specify a custom bank-vaults image with bankVaultsImage:
@@ -302,4 +307,3 @@ spec:
 #   persistentVolumeReclaimPolicy: Recycle
 #   hostPath:
 #     path: /vault/file
-
