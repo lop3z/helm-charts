@@ -3,6 +3,24 @@ entries:
   metabase:
   - apiVersion: v1
     appVersion: v0.50.6
+    created: "2024-11-14T10:18:50.866897312Z"
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
+    digest: ffa039bac561f256fe9c0c2b201d983f1549ce0b4358b1c2a0ddacca58e0cefd
+    home: http://www.metabase.com/
+    icon: http://www.metabase.com/images/logo.svg
+    maintainers:
+    - email: phamminhthanh69@gmail.com
+      name: pmint93
+    name: metabase
+    sources:
+    - https://github.com/metabase/metabase
+    - https://github.com/pmint93/helm-charts/metabase
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/metabase-2.16.7/metabase-2.16.7.tgz
+    version: 2.16.7
+  - apiVersion: v1
+    appVersion: v0.50.6
     created: "2024-07-04T08:36:19.173111031Z"
     description: The easy, open source way for everyone in your company to ask questions
       and learn from data.
@@ -1563,4 +1581,4 @@ entries:
     urls:
     - https://github.com/lop3z/helm-charts/releases/download/wireguard-0.4.0/wireguard-0.4.0.tgz
     version: 0.4.0
-generated: "2024-07-17T09:20:54.651478362Z"
+generated: "2024-11-14T10:18:50.867280386Z"
