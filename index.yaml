@@ -2,6 +2,24 @@ apiVersion: v1
 entries:
   metabase:
   - apiVersion: v1
+    appVersion: v0.56.20.x
+    created: "2026-03-17T14:33:09.795869362Z"
+    description: The easy, open source way for everyone in your company to ask questions
+      and learn from data.
+    digest: 74ffd8d10c28c063a5e2e7ef1568b0ac0d6da145296281dfda64203271c420da
+    home: http://www.metabase.com/
+    icon: http://www.metabase.com/images/logo.svg
+    maintainers:
+    - email: phamminhthanh69@gmail.com
+      name: pmint93
+    name: metabase
+    sources:
+    - https://github.com/metabase/metabase
+    - https://github.com/pmint93/helm-charts/metabase
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/metabase-2.24.3/metabase-2.24.3.tgz
+    version: 2.24.3
+  - apiVersion: v1
     appVersion: v0.56.2.x
     created: "2025-08-27T15:31:41.279403673Z"
     description: The easy, open source way for everyone in your company to ask questions
@@ -793,6 +811,20 @@ entries:
   pgbouncer:
   - apiVersion: v2
     appVersion: v1.21.0
+    created: "2026-03-17T14:33:09.9651264Z"
+    description: A Helm chart for Pgbouncer
+    digest: 468a37e414c634d7c53e5b5b4f95e700b07d624a7f07e7df5a0d9e60b55fe998
+    home: https://github.com/pmint93/helm-charts
+    maintainers:
+    - name: pmint93
+      url: https://github.com/pmint93
+    name: pgbouncer
+    type: application
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/pgbouncer-0.9.0/pgbouncer-0.9.0.tgz
+    version: 0.9.0
+  - apiVersion: v2
+    appVersion: v1.21.0
     created: "2025-08-27T15:31:41.475234061Z"
     description: A Helm chart for Pgbouncer
     digest: e2cbc7b348e6b7f08fde0e354e648c7762368023ac880a14098bfdd9b8994e69
@@ -876,6 +908,23 @@ entries:
     - https://github.com/lop3z/helm-charts/releases/download/pgbouncer-0.1.0/pgbouncer-0.1.0.tgz
     version: 0.1.0
   single-deployment:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2026-03-17T14:33:10.088649048Z"
+    dependencies:
+    - name: prefapp-helm
+      repository: https://prefapp.github.io/prefapp-helm
+      version: 0.11.0
+    description: A Helm chart for single deployment application
+    digest: e57c8993a88c2e6a4daa7b3a5afc9aefc3c288290088372b56aa4a2068288dfa
+    maintainers:
+    - email: phamminhthanh69@gmail.com
+      name: pmint93
+    name: single-deployment
+    type: application
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/single-deployment-0.4.4/single-deployment-0.4.4.tgz
+    version: 0.4.4
   - apiVersion: v2
     appVersion: latest
     created: "2025-08-27T15:31:41.672428508Z"
@@ -1663,4 +1712,4 @@ entries:
     urls:
     - https://github.com/lop3z/helm-charts/releases/download/wireguard-0.4.0/wireguard-0.4.0.tgz
     version: 0.4.0
-generated: "2025-08-27T15:31:41.672936022Z"
+generated: "2026-03-17T14:33:10.089139124Z"
