@@ -7,6 +7,8 @@ spec:
 {{- if .Values.vaultConfigurer.resources }}
     resources:
 {{ toYaml .Values.vaultConfigurer.resources | indent 6}}
+{{- else }}
+    {}
 {{- end }}
   size: {{ .Values.size }}
   image: {{ .Values.image }}
