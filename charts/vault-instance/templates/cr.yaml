@@ -225,9 +225,9 @@ spec:
     #         generate_lease: true
     #         ttl: 1m
   vaultEnvsConfig:
-    - name: VAULT_LOG_LEVEL
-      value: {{ .Values.logLevel }}
-
+{{- if .Values.vaultEnvsConfig }}
+{{ toYaml .Values.vaultEnvsConfig | indent 2 }}
+{{- end }}
 
   # Allows writing some secrets to Vault (useful for development purposes).
   # See https://www.vaultproject.io/docs/secrets/kv/index.html for more information.

@@ -52,7 +52,15 @@ tlsAdditionalHosts: []
 primary: true
 raftLeaderAddress: "vault-primary.jx-vault.svc.cluster.local"
 secretTlsPrimaryName: "vault-primary-tls"
-logLevel: info
+
+vaultEnvsConfig:
+  - name: VAULT_LOG_LEVEL
+    value: info
+  - name: VAULT_OIDC_CLIENT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: vault-oidc-secret
+        key: client_secret
 
 ##
 jxRequirements:
