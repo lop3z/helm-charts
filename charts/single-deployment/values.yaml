@@ -166,6 +166,17 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+httproute:
+  enabled: false
+  # gatewayName: ""
+  # gatewayNamespace: ""
+  labels: {}
+  path: /
+  pathType: PathPrefix
+  # rewriteTo: /
+  hosts:
+    - default-backend.example.io
+
 ## Additional environment variables to set
 extraEnvs: {}
   # LOG_LEVEL: info

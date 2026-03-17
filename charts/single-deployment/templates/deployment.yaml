@@ -14,7 +14,10 @@ strategy:
 pod_labels:
   {{- include "single-deployment.selectorLabels" . | nindent 4 }}
 pod_annotations:
-  {{- toYaml .Values.podAnnotations | nindent 2 }}
+  checksum/env-secret: {{ include (print $.Template.BasePath "/env-secret.yaml") . | sha256sum }}
+  {{- with .Values.podAnnotations }}
+  {{ toYaml . | nindent 2 }}
+  {{- end }}
 topologySpreadConstraints:
   {{- toYaml .Values.topologySpreadConstraints | nindent 2 }}
 tolerations:

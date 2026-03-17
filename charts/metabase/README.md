@@ -60,7 +60,7 @@ The following table lists the configurable parameters of the Metabase chart and 
 | podAnnotations                                  | controller pods annotations                                                | {}                |
 | podLabels                                       | extra pods labels                                                          | {}                |
 | image.repository                                | controller container image repository                                      | metabase/metabase |
-| image.tag                                       | controller container image tag                                             | v0.49.3           |
+| image.tag                                       | controller container image tag                                             | null              |
 | image.command                                   | controller container image command                                         | []                |
 | image.pullPolicy                                | controller container image pull policy                                     | IfNotPresent      |
 | image.pullSecrets                               | controller container image pull secrets                                    | []                |
@@ -83,15 +83,27 @@ The following table lists the configurable parameters of the Metabase chart and 
 | database.dbname                                 | Database name                                                              | null              |
 | database.username                               | Database username                                                          | null              |
 | database.password                               | Database password                                                          | null              |
-| database.existingSecret                         | Exising secret for database credentials                                    | null              |
-| database.existingSecretUsernameKey              | Username key for exising secret                                            | null              |
-| database.existingSecretPasswordKey              | Password key for exising secret                                            | null              |
-| database.existingSecretConnectionURIKey         | ConnectionURI key for exising secret                                       | null              |
-| database.existingSecretEncryptionKeyKey         | EncryptionKey key for exising secret                                       | null              |
+| database.existingSecret                         | existing secret for database credentials                                   | null              |
+| database.existingSecretUsernameKey              | Username key for existing secret                                           | null              |
+| database.existingSecretPasswordKey              | Password key for existing secret                                           | null              |
+| database.existingSecretConnectionURIKey         | ConnectionURI key for existing secret                                      | null              |
+| database.existingSecretEncryptionKeyKey         | EncryptionKey key for existing secret                                      | null              |
 | database.googleCloudSQL.instanceConnectionNames | Google Cloud SQL instance connection names. See `values.yaml` for details. | []                |
+| database.googleCloudSQL.sidecarImage            | Specific image for the Google Cloud SQL Auth proxy sidecar                 | gcr.io/cloudsql-docker/gce-proxy            |
 | database.googleCloudSQL.sidecarImageTag         | Specific tag for the Google Cloud SQL Auth proxy sidecar image             | latest            |
 | database.googleCloudSQL.resources               | Google Cloud SQL Auth proxy resource requests and limits                   | {}                |
-| database.googleCloudSQL.securityContext         | Google Cloud SQL Security Context                                          | runAsNonRoot: true| 
+| database.googleCloudSQL.securityContext         | Google Cloud SQL Security Context                                          | runAsNonRoot: true|
+| database.postgresBackupHook.enabled             | Enables pg_dump backup pre-upgrade hook of Metabase application database   | false             |
+| database.postgresBackupHook.image               | image that contains 'pg_dump'                                              | postgres:latest   |
+| database.postgresBackupHook.existingSecret      | existing secret for database credentials                                   | null              |
+| database.postgresBackupHook.existingSecretUsernameKey      | Username key for existing secret                                | null              |
+| database.postgresBackupHook.existingSecretPasswordKey      | Password key for existing secret                                | null              |
+| database.postgresBackupHook.existingSecretHostKey          | Username key for existing secret                                | null              |
+| database.postgresBackupHook.existingSecretPortKey          | Password key for existing secret                                | null              |
+| database.postgresBackupHook.existingSecretDatabaseNameKey  | Password key for existing secret                                | null              |
+| database.postgresBackupHook.existingSecretConnectionURIKey | ConnectionURI key for existing secret                           | null              |
+| database.postgresBackupHook.pvcName             | name of the PersistenceVolumeClaim to store the backup                     | null              |
+| database.postgresBackupHook.schema              | pg_dump '--schema' option                                                  | null              |
 | password.complexity                             | Complexity requirement for Metabase account's password                     | normal            |
 | password.length                                 | Minimum length required for Metabase account's password                    | 6                 |
 | timeZone                                        | Service time zone                                                          | UTC               |
@@ -102,10 +114,13 @@ The following table lists the configurable parameters of the Metabase chart and 
 | extraInitContainers                             | Additional init containers e.g. to download plugins                        | []                |
 | extraVolumes                                    | Additional server volumes                                                  | []                |
 | extraVolumeMounts                               | Additional server volumeMounts                                             | []                |
-| livenessProbe.initialDelaySeconds               | Delay before liveness probe is initiated                                   | 120               |
+| startupProbe.timeoutSeconds                     | When the probe times out                                                   | 3                 |
+| startupProbe.failureThreshold                   | Minimum consecutive failures for the probe                                 | 60                |
+| startupProbe.periodSeconds                      | How often to perform the probe                                             | 5                 |
+| livenessProbe.initialDelaySeconds               | Delay before liveness probe is initiated                                   | 5                 |
 | livenessProbe.timeoutSeconds                    | When the probe times out                                                   | 30                |
 | livenessProbe.failureThreshold                  | Minimum consecutive failures for the probe                                 | 6                 |
-| readinessProbe.initialDelaySeconds              | Delay before readiness probe is initiated                                  | 30                |
+| readinessProbe.initialDelaySeconds              | Delay before readiness probe is initiated                                  | 5                 |
 | readinessProbe.timeoutSeconds                   | When the probe times out                                                   | 3                 |
 | readinessProbe.periodSeconds                    | How often to perform the probe                                             | 5                 |
 | service.type                                    | ClusterIP, NodePort, or LoadBalancer                                       | ClusterIP         |
@@ -129,6 +144,7 @@ The following table lists the configurable parameters of the Metabase chart and 
 | ingress.annotations                             | Ingress annotations configuration                                          | {}                |
 | ingress.tls                                     | Ingress TLS configuration                                                  | null              |
 | route.enabled                                   | Enable OpenShift route resource                                            | false             |
+| route.labels                                    | Route labels configuration                                                 | null              |
 | route.annotations                               | Route annotations configuration                                            | {}                |
 | route.host                                      | Route hostname                                                             | null              |
 | route.path                                      | Route path                                                                 | ""                |
