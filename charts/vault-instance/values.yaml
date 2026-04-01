@@ -53,6 +53,8 @@ primary: true
 raftLeaderAddress: "vault-primary.jx-vault.svc.cluster.local"
 secretTlsPrimaryName: "vault-primary-tls"
 
+oidcClientSecret: ""
+
 vaultEnvsConfig:
   - name: VAULT_LOG_LEVEL
     value: info
