@@ -1,0 +1,6 @@
+postgresql:
+  password: ""
+
+s3:
+  accessKeyId: ""
+  accessSecretKey: ""

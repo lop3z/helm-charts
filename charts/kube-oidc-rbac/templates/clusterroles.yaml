@@ -1,0 +1,79 @@
+# namespace-view: read-only access to common namespace resources, explicitly excludes secrets.
+# Use instead of the built-in 'view' ClusterRole which may have a wildcard rule on some clusters.
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: namespace-view
+rules:
+- apiGroups: [""]
+  resources:
+  - configmaps
+  - endpoints
+  - persistentvolumeclaims
+  - persistentvolumeclaims/status
+  - pods
+  - pods/log
+  - pods/status
+  - replicationcontrollers
+  - replicationcontrollers/scale
+  - replicationcontrollers/status
+  - resourcequotas
+  - resourcequotas/status
+  - serviceaccounts
+  - services
+  - services/status
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources:
+  - controllerrevisions
+  - daemonsets
+  - daemonsets/status
+  - deployments
+  - deployments/scale
+  - deployments/status
+  - replicasets
+  - replicasets/scale
+  - replicasets/status
+  - statefulsets
+  - statefulsets/scale
+  - statefulsets/status
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["autoscaling"]
+  resources:
+  - horizontalpodautoscalers
+  - horizontalpodautoscalers/status
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["batch"]
+  resources:
+  - cronjobs
+  - cronjobs/status
+  - jobs
+  - jobs/status
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["networking.k8s.io"]
+  resources:
+  - ingresses
+  - ingresses/status
+  - networkpolicies
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["policy"]
+  resources:
+  - poddisruptionbudgets
+  - poddisruptionbudgets/status
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["discovery.k8s.io"]
+  resources:
+  - endpointslices
+  verbs: ["get", "list", "watch"]
+---
+# secrets-view: read-only access to secrets only.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: secrets-view
+rules:
+- apiGroups: [""]
+  resources:
+  - secrets
+  verbs: ["get", "list", "watch"]

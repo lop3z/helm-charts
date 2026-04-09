@@ -1,0 +1,5 @@
+apiVersion: v2
+name: keycloak-pg
+description: Kubernetes Secrets for the Keycloak CNPG cluster (app user + S3 backup credentials)
+type: application
+version: 0.1.0

@@ -1,0 +1,15 @@
+{{- range .Values.namespaceBindings }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .group }}
+subjects:
+  - kind: Group
+    name: {{ $.Values.groupsPrefix }}{{ .group }}
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: {{ .role }}
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

@@ -1,0 +1,13 @@
+# Prefix prepended to group names to form the Kubernetes group subject.
+# Must match the groupsPrefix configured on the cluster OIDC provider.
+groupsPrefix: "oidc:"
+
+# Cluster-wide bindings (ClusterRoleBinding).
+# - group: OIDC group name (without prefix)
+# - clusterRole: Kubernetes ClusterRole to bind to
+clusterBindings: []
+
+# Namespace-scoped bindings (RoleBinding).
+# - group: OIDC group name (without prefix)
+# - role: Kubernetes ClusterRole to bind to
+namespaceBindings: []

@@ -1,0 +1,5 @@
+apiVersion: v2
+name: kube-oidc-rbac
+description: ClusterRoles, ClusterRoleBindings, and RoleBindings mapping OIDC groups to Kubernetes RBAC
+type: application
+version: 0.1.0
