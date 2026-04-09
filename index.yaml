@@ -13,6 +13,16 @@ entries:
     version: 0.1.0
   kube-oidc-rbac:
   - apiVersion: v2
+    created: "2026-04-09T13:33:17.210856503Z"
+    description: ClusterRoles, ClusterRoleBindings, and RoleBindings mapping OIDC
+      groups to Kubernetes RBAC
+    digest: 0658fb2e10d1850d35a637c6e3c16054c355a530c43e1dcca5cc905144b450d2
+    name: kube-oidc-rbac
+    type: application
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/kube-oidc-rbac-0.3.0/kube-oidc-rbac-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
     created: "2026-04-09T13:00:19.48766033Z"
     description: ClusterRoles, ClusterRoleBindings, and RoleBindings mapping OIDC
       groups to Kubernetes RBAC
@@ -1786,4 +1796,4 @@ entries:
     urls:
     - https://github.com/lop3z/helm-charts/releases/download/wireguard-0.4.0/wireguard-0.4.0.tgz
     version: 0.4.0
-generated: "2026-04-09T13:00:19.487951933Z"
+generated: "2026-04-09T13:33:17.211176101Z"
