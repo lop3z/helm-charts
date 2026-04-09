@@ -7,17 +7,11 @@ groupsPrefix: "oidc:"
 # - clusterRole: Kubernetes ClusterRole to bind to
 clusterBindings: []
 
-# Namespace-scoped bindings (RoleBinding) — explicit, full control.
-# - group: OIDC group name (without prefix)
-# - role: Kubernetes ClusterRole to bind to
-# - namespace: target namespace for the RoleBinding
-namespaceBindings: []
-
-# Dynamic namespace bindings — generates view/secrets-view/edit RoleBindings
+# Namespace-scoped bindings — generates view/secrets-view/edit RoleBindings
 # for every namespace listed, using the clusterPrefix naming convention:
-#   {clusterPrefix}-{namespace}-view        → namespace-view
+#   {clusterPrefix}-{namespace}-view         → namespace-view
 #   {clusterPrefix}-{namespace}-secrets-view → secrets-view
-#   {clusterPrefix}-{namespace}-edit        → edit
+#   {clusterPrefix}-{namespace}-edit         → edit
 # clusterPrefix: "k8s-bhs5"
 clusterPrefix: ""
 managedNamespaces: []
