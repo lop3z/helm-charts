@@ -10,4 +10,5 @@ clusterBindings: []
 # Namespace-scoped bindings (RoleBinding).
 # - group: OIDC group name (without prefix)
 # - role: Kubernetes ClusterRole to bind to
+# - namespace: target namespace for the RoleBinding
 namespaceBindings: []

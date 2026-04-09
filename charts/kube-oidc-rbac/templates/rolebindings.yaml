@@ -4,6 +4,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: {{ .group }}
+  namespace: {{ .namespace }}
 subjects:
   - kind: Group
     name: {{ $.Values.groupsPrefix }}{{ .group }}
