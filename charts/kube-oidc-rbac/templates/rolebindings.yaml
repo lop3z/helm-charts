@@ -18,24 +18,27 @@ roleRef:
 {{- range .Values.managedNamespaces }}
 {{- $ns := . }}
 {{- $prefix := $.Values.clusterPrefix }}
+{{- $groupsPrefix := $.Values.groupsPrefix }}
 {{- range list
-  (dict "group" (printf "%s-%s-view" $prefix $ns)         "role" "namespace-view" "namespace" $ns)
-  (dict "group" (printf "%s-%s-secrets-view" $prefix $ns) "role" "secrets-view"   "namespace" $ns)
-  (dict "group" (printf "%s-%s-edit" $prefix $ns)         "role" "edit"           "namespace" $ns)
+  (list (printf "%s-%s-view" $prefix $ns)         "namespace-view")
+  (list (printf "%s-%s-secrets-view" $prefix $ns) "secrets-view")
+  (list (printf "%s-%s-edit" $prefix $ns)         "edit")
 }}
+{{- $group := index . 0 }}
+{{- $role  := index . 1 }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ .group }}
-  namespace: {{ .namespace }}
+  name: {{ $group }}
+  namespace: {{ $ns }}
 subjects:
   - kind: Group
-    name: {{ $.Values.groupsPrefix }}{{ .group }}
+    name: {{ $groupsPrefix }}{{ $group }}
     apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: ClusterRole
-  name: {{ .role }}
+  name: {{ $role }}
   apiGroup: rbac.authorization.k8s.io
 {{- end }}
 {{- end }}
