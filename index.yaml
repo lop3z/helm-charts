@@ -1,5 +1,27 @@
 apiVersion: v1
 entries:
+  keycloak-pg:
+  - apiVersion: v2
+    created: "2026-04-09T09:25:03.26709741Z"
+    description: Kubernetes Secrets for the Keycloak CNPG cluster (app user + S3 backup
+      credentials)
+    digest: 8b113a48d5383543983d6691b5517f08d0b46ffa55f7fd342ee69aef0cc9f9ac
+    name: keycloak-pg
+    type: application
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/keycloak-pg-0.1.0/keycloak-pg-0.1.0.tgz
+    version: 0.1.0
+  kube-oidc-rbac:
+  - apiVersion: v2
+    created: "2026-04-09T09:25:03.445767179Z"
+    description: ClusterRoles, ClusterRoleBindings, and RoleBindings mapping OIDC
+      groups to Kubernetes RBAC
+    digest: 8a64364c1415e2eb1dea4cbae8d6269320bd676a3a15ad474e28bba318cfcf79
+    name: kube-oidc-rbac
+    type: application
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/kube-oidc-rbac-0.1.0/kube-oidc-rbac-0.1.0.tgz
+    version: 0.1.0
   metabase:
   - apiVersion: v1
     appVersion: v0.56.20.x
@@ -1754,4 +1776,4 @@ entries:
     urls:
     - https://github.com/lop3z/helm-charts/releases/download/wireguard-0.4.0/wireguard-0.4.0.tgz
     version: 0.4.0
-generated: "2026-04-01T15:04:38.718883948Z"
+generated: "2026-04-09T09:25:03.445972687Z"
