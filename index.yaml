@@ -1,5 +1,16 @@
 apiVersion: v1
 entries:
+  hyperping-exporter:
+  - apiVersion: v2
+    appVersion: 1.0.1
+    created: "2026-04-14T18:24:11.671602905Z"
+    description: Prometheus exporter for Hyperping monitoring metrics
+    digest: 809d0a65e0d827f26fab5ce686c01a5400d40f432f75e8f2832102e3b278755a
+    name: hyperping-exporter
+    type: application
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/hyperping-exporter-0.1.0/hyperping-exporter-0.1.0.tgz
+    version: 0.1.0
   keycloak-pg:
   - apiVersion: v2
     created: "2026-04-09T09:25:03.26709741Z"
@@ -1816,4 +1827,4 @@ entries:
     urls:
     - https://github.com/lop3z/helm-charts/releases/download/wireguard-0.4.0/wireguard-0.4.0.tgz
     version: 0.4.0
-generated: "2026-04-09T14:33:31.191104897Z"
+generated: "2026-04-14T18:24:11.671870317Z"
