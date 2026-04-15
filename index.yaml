@@ -73,6 +73,18 @@ entries:
     urls:
     - https://github.com/lop3z/helm-charts/releases/download/kube-oidc-rbac-0.1.0/kube-oidc-rbac-0.1.0.tgz
     version: 0.1.0
+  kube-prometheus-rules:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-04-15T08:42:36.575274023Z"
+    description: Community-inspired Prometheus alerting rules for Kubernetes observability
+      (PVC, node, pod, disk)
+    digest: 1364497b3a296bc629a38df5c6d0f30ad563fcc96c4b70d3c5f2785cc32a31e8
+    name: kube-prometheus-rules
+    type: application
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/kube-prometheus-rules-0.1.0/kube-prometheus-rules-0.1.0.tgz
+    version: 0.1.0
   metabase:
   - apiVersion: v1
     appVersion: v0.56.20.x
@@ -1827,4 +1839,4 @@ entries:
     urls:
     - https://github.com/lop3z/helm-charts/releases/download/wireguard-0.4.0/wireguard-0.4.0.tgz
     version: 0.4.0
-generated: "2026-04-14T18:24:11.671870317Z"
+generated: "2026-04-15T08:42:36.575541695Z"
