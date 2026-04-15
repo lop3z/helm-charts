@@ -1,0 +1,176 @@
+{{- if .Values.rules.node.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ .Release.Name }}-node
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kube-prometheus-rules.labels" . | nindent 4 }}
+    gitops.jenkins-x.io/pipeline: namespaces
+spec:
+  groups:
+  - name: kubernetes.node
+    rules:
+    - alert: KubeNodeMemoryHigh
+      annotations:
+        description: >
+          Node {{ "{{" }} $labels.instance {{ "}}" }} memory usage is
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
+        summary: Node memory usage high ({{ .Values.clusterRegion }})
+      expr: |-
+        (
+          1 - (
+            node_memory_MemAvailable_bytes{cluster_region="{{ .Values.clusterRegion }}"}
+            / node_memory_MemTotal_bytes{cluster_region="{{ .Values.clusterRegion }}"}
+          )
+        ) * 100 > {{ .Values.rules.node.memoryWarningThreshold }}
+      for: 5m
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeNodeMemoryHigh
+      annotations:
+        description: >
+          Node {{ "{{" }} $labels.instance {{ "}}" }} memory usage is
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
+          Immediate action required.
+        summary: Node memory critically high ({{ .Values.clusterRegion }})
+      expr: |-
+        (
+          1 - (
+            node_memory_MemAvailable_bytes{cluster_region="{{ .Values.clusterRegion }}"}
+            / node_memory_MemTotal_bytes{cluster_region="{{ .Values.clusterRegion }}"}
+          )
+        ) * 100 > {{ .Values.rules.node.memoryCriticalThreshold }}
+      for: 5m
+      labels:
+        severity: critical
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeNodeCPUSaturation
+      annotations:
+        description: >
+          Node {{ "{{" }} $labels.instance {{ "}}" }} CPU usage is
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
+        summary: Node CPU saturation ({{ .Values.clusterRegion }})
+      expr: |-
+        (
+          1 - avg by (instance, cluster_region) (
+            rate(node_cpu_seconds_total{
+              mode="idle",
+              cluster_region="{{ .Values.clusterRegion }}"
+            }[5m])
+          )
+        ) * 100 > {{ .Values.rules.node.cpuWarningThreshold }}
+      for: 10m
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeNodeFilesystemAlmostFull
+      annotations:
+        description: >
+          Node {{ "{{" }} $labels.instance {{ "}}" }} root filesystem is
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% full on cluster {{ .Values.clusterRegion }}.
+        summary: Node root filesystem almost full ({{ .Values.clusterRegion }})
+        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/node/nodefilesystemalmostoutofspace
+      expr: |-
+        (
+          1 - (
+            node_filesystem_avail_bytes{
+              cluster_region="{{ .Values.clusterRegion }}",
+              mountpoint="/",
+              fstype!~"tmpfs|fuse.lxcfs|squashfs"
+            }
+            / node_filesystem_size_bytes{
+              cluster_region="{{ .Values.clusterRegion }}",
+              mountpoint="/",
+              fstype!~"tmpfs|fuse.lxcfs|squashfs"
+            }
+          )
+        ) * 100 > {{ .Values.rules.node.diskWarningThreshold }}
+      for: 5m
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeNodeFilesystemAlmostFull
+      annotations:
+        description: >
+          Node {{ "{{" }} $labels.instance {{ "}}" }} root filesystem is
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% full on cluster {{ .Values.clusterRegion }}.
+          Immediate action required.
+        summary: Node root filesystem critically full ({{ .Values.clusterRegion }})
+        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/node/nodefilesystemalmostoutofspace
+      expr: |-
+        (
+          1 - (
+            node_filesystem_avail_bytes{
+              cluster_region="{{ .Values.clusterRegion }}",
+              mountpoint="/",
+              fstype!~"tmpfs|fuse.lxcfs|squashfs"
+            }
+            / node_filesystem_size_bytes{
+              cluster_region="{{ .Values.clusterRegion }}",
+              mountpoint="/",
+              fstype!~"tmpfs|fuse.lxcfs|squashfs"
+            }
+          )
+        ) * 100 > {{ .Values.rules.node.diskCriticalThreshold }}
+      for: 5m
+      labels:
+        severity: critical
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeNodeFilesystemSpaceFillingUp
+      annotations:
+        description: >
+          Node {{ "{{" }} $labels.instance {{ "}}" }} root filesystem is predicted to fill up
+          within 24 hours on cluster {{ .Values.clusterRegion }}.
+        summary: Node root filesystem predicted to be full in 24h ({{ .Values.clusterRegion }})
+        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/node/nodefilesystemspacefillingup
+      expr: |-
+        (
+          node_filesystem_avail_bytes{
+            cluster_region="{{ .Values.clusterRegion }}",
+            mountpoint="/",
+            fstype!~"tmpfs|fuse.lxcfs|squashfs"
+          } / node_filesystem_size_bytes{
+            cluster_region="{{ .Values.clusterRegion }}",
+            mountpoint="/",
+            fstype!~"tmpfs|fuse.lxcfs|squashfs"
+          } * 100 < 15
+        )
+        and
+        predict_linear(
+          node_filesystem_avail_bytes{
+            cluster_region="{{ .Values.clusterRegion }}",
+            mountpoint="/",
+            fstype!~"tmpfs|fuse.lxcfs|squashfs"
+          }[6h],
+          86400
+        ) < 0
+      for: 1h
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeNodePressure
+      annotations:
+        description: >
+          Node {{ "{{" }} $labels.node {{ "}}" }} has {{ "{{" }} $labels.condition {{ "}}" }}
+          pressure on cluster {{ .Values.clusterRegion }}.
+        summary: Node pressure condition active ({{ .Values.clusterRegion }})
+        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubenodepressure
+      expr: |-
+        kube_node_status_condition{
+          condition=~"MemoryPressure|DiskPressure|PIDPressure",
+          status="true",
+          cluster_region="{{ .Values.clusterRegion }}"
+        } == 1
+      for: 10m
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+{{- end }}

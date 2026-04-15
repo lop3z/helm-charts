@@ -13,3 +13,14 @@ rules:
     criticalThreshold: 97
     # Warning: PVC predicted to be full within this many hours
     predictFullInHours: 96
+
+  node:
+    enabled: true
+    # Memory usage thresholds (%)
+    memoryWarningThreshold: 85
+    memoryCriticalThreshold: 95
+    # CPU usage threshold (%)
+    cpuWarningThreshold: 90
+    # Root disk usage thresholds (%)
+    diskWarningThreshold: 85
+    diskCriticalThreshold: 95
