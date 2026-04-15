@@ -1,0 +1,108 @@
+{{- if .Values.rules.pvc.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ .Release.Name }}-pvc
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kube-prometheus-rules.labels" . | nindent 4 }}
+    gitops.jenkins-x.io/pipeline: namespaces
+spec:
+  groups:
+  - name: kubernetes.pvc
+    rules:
+    - alert: KubePersistentVolumeFillingUp
+      annotations:
+        description: >
+          PVC {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.persistentvolumeclaim {{ "}}" }}
+          is {{ "{{" }} printf "%.0f" $value {{ "}}" }}% full on cluster {{ .Values.clusterRegion }}.
+        summary: PVC is almost full ({{ .Values.clusterRegion }})
+        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubepersistentvolumefillingup
+      expr: |-
+        (
+          kubelet_volume_stats_used_bytes{cluster_region="{{ .Values.clusterRegion }}"}
+          / kubelet_volume_stats_capacity_bytes{cluster_region="{{ .Values.clusterRegion }}"}
+          * 100
+        ) > {{ .Values.rules.pvc.warningThreshold }}
+      for: 1m
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubePersistentVolumeFillingUp
+      annotations:
+        description: >
+          PVC {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.persistentvolumeclaim {{ "}}" }}
+          is {{ "{{" }} printf "%.0f" $value {{ "}}" }}% full on cluster {{ .Values.clusterRegion }}.
+          Immediate action required.
+        summary: PVC is critically full ({{ .Values.clusterRegion }})
+        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubepersistentvolumefillingup
+      expr: |-
+        (
+          kubelet_volume_stats_used_bytes{cluster_region="{{ .Values.clusterRegion }}"}
+          / kubelet_volume_stats_capacity_bytes{cluster_region="{{ .Values.clusterRegion }}"}
+          * 100
+        ) > {{ .Values.rules.pvc.criticalThreshold }}
+      for: 1m
+      labels:
+        severity: critical
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubePersistentVolumeFillingUpPredicted
+      annotations:
+        description: >
+          PVC {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.persistentvolumeclaim {{ "}}" }}
+          is predicted to fill up within {{ .Values.rules.pvc.predictFullInHours }} hours on cluster {{ .Values.clusterRegion }}.
+        summary: PVC predicted to be full in {{ .Values.rules.pvc.predictFullInHours }}h ({{ .Values.clusterRegion }})
+        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubepersistentvolumefillingup
+      expr: |-
+        (
+          kubelet_volume_stats_available_bytes{cluster_region="{{ .Values.clusterRegion }}"}
+          / kubelet_volume_stats_capacity_bytes{cluster_region="{{ .Values.clusterRegion }}"}
+          * 100 < 15
+        )
+        and
+        predict_linear(
+          kubelet_volume_stats_available_bytes{cluster_region="{{ .Values.clusterRegion }}"}[6h],
+          {{ mul .Values.rules.pvc.predictFullInHours 3600 }}
+        ) < 0
+      for: 1h
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubePersistentVolumeInodesFillingUp
+      annotations:
+        description: >
+          PVC {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.persistentvolumeclaim {{ "}}" }}
+          has only {{ "{{" }} printf "%.0f" $value {{ "}}" }}% inodes free on cluster {{ .Values.clusterRegion }}.
+        summary: PVC inodes almost exhausted ({{ .Values.clusterRegion }})
+        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubepersistentvolumeinodesfillingup
+      expr: |-
+        (
+          kubelet_volume_stats_inodes_free{cluster_region="{{ .Values.clusterRegion }}"}
+          / kubelet_volume_stats_inodes{cluster_region="{{ .Values.clusterRegion }}"}
+          * 100
+        ) < 5
+      for: 1m
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubePersistentVolumeErrors
+      annotations:
+        description: >
+          PVC {{ "{{" }} $labels.persistentvolumeclaim {{ "}}" }} is in {{ "{{" }} $labels.phase {{ "}}" }}
+          phase on cluster {{ .Values.clusterRegion }}.
+        summary: PVC in Failed or Pending state ({{ .Values.clusterRegion }})
+        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubepersistentvolumeerrors
+      expr: |-
+        kube_persistentvolume_status_phase{
+          phase=~"Failed|Pending",
+          cluster_region="{{ .Values.clusterRegion }}"
+        } > 0
+      for: 5m
+      labels:
+        severity: critical
+        cluster_region: {{ .Values.clusterRegion }}
+{{- end }}
