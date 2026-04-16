@@ -15,3 +15,4 @@ clusterBindings: []
 # clusterPrefix: "k8s-bhs5"
 clusterPrefix: ""
 managedNamespaces: []
+createClusterRoleBindings: false
