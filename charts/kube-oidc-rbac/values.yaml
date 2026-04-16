@@ -14,5 +14,5 @@ clusterBindings: []
 #   {clusterPrefix}-{namespace}-edit         → edit
 # clusterPrefix: "k8s-bhs5"
 clusterPrefix: ""
-managedNamespaces: []
+namespaceBindings: []
 createClusterRoleBindings: false
