@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-node-exporter-full
+  namespace: {{ .Release.Namespace }}
+  labels:
+    jenkins-x.io/grafana-dashboard: "1"
+  annotations:
+    grafana_folder: "Kubernetes / Nodes"
+data:
+  node-exporter-full.json: |
+    {{ .Files.Get "dashboards/node-exporter-full.json" | nindent 4 | trim }}

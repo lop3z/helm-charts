@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-pvc-pod-overview
+  namespace: {{ .Release.Namespace }}
+  labels:
+    jenkins-x.io/grafana-dashboard: "1"
+  annotations:
+    grafana_folder: "Kubernetes / Storage"
+data:
+  pvc-pod-overview.json: |
+    {{ .Files.Get "dashboards/pvc-pod-overview.json" | nindent 4 | trim }}
