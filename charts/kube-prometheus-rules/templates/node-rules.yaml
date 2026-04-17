@@ -63,9 +63,30 @@ spec:
             }[5m])
           )
         ) * 100 > {{ .Values.rules.node.cpuWarningThreshold }}
-      for: 10m
+      for: 5m
       labels:
         severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeNodeCPUSaturation
+      annotations:
+        description: >
+          Node {{ "{{" }} $labels.instance {{ "}}" }} CPU usage is
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
+          Immediate action required.
+        summary: Node CPU critically saturated ({{ .Values.clusterRegion }})
+      expr: |-
+        (
+          1 - avg by (instance, cluster_region) (
+            rate(node_cpu_seconds_total{
+              mode="idle",
+              cluster_region="{{ .Values.clusterRegion }}"
+            }[5m])
+          )
+        ) * 100 > {{ .Values.rules.node.cpuCriticalThreshold }}
+      for: 5m
+      labels:
+        severity: critical
         cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeNodeFilesystemAlmostFull
@@ -90,7 +111,7 @@ spec:
             }
           )
         ) * 100 > {{ .Values.rules.node.diskWarningThreshold }}
-      for: 5m
+      for: 10m
       labels:
         severity: warning
         cluster_region: {{ .Values.clusterRegion }}
@@ -118,7 +139,60 @@ spec:
             }
           )
         ) * 100 > {{ .Values.rules.node.diskCriticalThreshold }}
-      for: 5m
+      for: 10m
+      labels:
+        severity: critical
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeNodeInodesSaturation
+      annotations:
+        description: >
+          Node {{ "{{" }} $labels.instance {{ "}}" }} inode usage is
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
+        summary: Node root filesystem inode saturation ({{ .Values.clusterRegion }})
+      expr: |-
+        (
+          1 - (
+            node_filesystem_files_free{
+              cluster_region="{{ .Values.clusterRegion }}",
+              mountpoint="/",
+              fstype!~"tmpfs|fuse.lxcfs|squashfs"
+            }
+            / node_filesystem_files{
+              cluster_region="{{ .Values.clusterRegion }}",
+              mountpoint="/",
+              fstype!~"tmpfs|fuse.lxcfs|squashfs"
+            }
+          )
+        ) * 100 > {{ .Values.rules.node.inodeWarningThreshold }}
+      for: 10m
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeNodeInodesSaturation
+      annotations:
+        description: >
+          Node {{ "{{" }} $labels.instance {{ "}}" }} inode usage is
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
+          Immediate action required.
+        summary: Node root filesystem inodes critically saturated ({{ .Values.clusterRegion }})
+      expr: |-
+        (
+          1 - (
+            node_filesystem_files_free{
+              cluster_region="{{ .Values.clusterRegion }}",
+              mountpoint="/",
+              fstype!~"tmpfs|fuse.lxcfs|squashfs"
+            }
+            / node_filesystem_files{
+              cluster_region="{{ .Values.clusterRegion }}",
+              mountpoint="/",
+              fstype!~"tmpfs|fuse.lxcfs|squashfs"
+            }
+          )
+        ) * 100 > {{ .Values.rules.node.inodeCriticalThreshold }}
+      for: 10m
       labels:
         severity: critical
         cluster_region: {{ .Values.clusterRegion }}

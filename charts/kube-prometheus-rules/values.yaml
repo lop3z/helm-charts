@@ -7,10 +7,14 @@ namespace: jx-observability
 rules:
   pvc:
     enabled: true
-    # Warning: PVC usage > warningThreshold %
-    warningThreshold: 85
-    # Critical: PVC usage > criticalThreshold %
-    criticalThreshold: 97
+    # Warning: PVC capacity usage > warningThreshold %
+    warningThreshold: 75
+    # Critical: PVC capacity usage > criticalThreshold %
+    criticalThreshold: 85
+    # Warning: PVC inode usage > inodeWarningThreshold %
+    inodeWarningThreshold: 75
+    # Critical: PVC inode usage > inodeCriticalThreshold %
+    inodeCriticalThreshold: 85
     # Warning: PVC predicted to be full within this many hours
     predictFullInHours: 96
 
@@ -19,8 +23,12 @@ rules:
     # Memory usage thresholds (%)
     memoryWarningThreshold: 85
     memoryCriticalThreshold: 95
-    # CPU usage threshold (%)
-    cpuWarningThreshold: 90
+    # CPU usage thresholds (%)
+    cpuWarningThreshold: 80
+    cpuCriticalThreshold: 90
     # Root disk usage thresholds (%)
     diskWarningThreshold: 85
     diskCriticalThreshold: 95
+    # Root filesystem inode usage thresholds (%)
+    inodeWarningThreshold: 85
+    inodeCriticalThreshold: 95
