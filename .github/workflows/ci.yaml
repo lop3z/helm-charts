@@ -40,9 +40,14 @@ jobs:
         run: ct lint --target-branch ${{ github.event.repository.default_branch }}
 
       - name: Create kind cluster
-        if: "steps.list-changed.outputs.changed == 'true' && ! contains(env.commitmsg, '[skip install]')"
+        if: steps.list-changed.outputs.changed == 'true'
         uses: helm/kind-action@v1.7.0
 
+      - name: Install prometheus-operator CRDs
+        if: steps.list-changed.outputs.changed == 'true'
+        run: |
+          kubectl apply --server-side -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.75.0/example/prometheus-operator-crd/monitoring.coreos.com_prometheusrules.yaml
+
       - name: Run chart-testing (install)
-        if: "steps.list-changed.outputs.changed == 'true' && ! contains(env.commitmsg, '[skip install]')"
+        if: steps.list-changed.outputs.changed == 'true'
         run: ct install --target-branch ${{ github.event.repository.default_branch }}
