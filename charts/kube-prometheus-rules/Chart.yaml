@@ -4,3 +4,5 @@ description: Community-inspired Prometheus alerting rules for Kubernetes observa
 type: application
 version: 0.4.0
 appVersion: "1.0.0"
+maintainers:
+  - name: lop3z
