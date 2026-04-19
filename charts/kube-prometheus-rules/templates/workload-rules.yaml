@@ -1,0 +1,202 @@
+{{- if .Values.rules.workload.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ .Release.Name }}-workload
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kube-prometheus-rules.labels" . | nindent 4 }}
+    gitops.jenkins-x.io/pipeline: namespaces
+spec:
+  groups:
+  - name: kubernetes.workload
+    rules:
+    - alert: KubePodRestartSpike
+      annotations:
+        description: >
+          Pod {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.pod {{ "}}" }}
+          container {{ "{{" }} $labels.container {{ "}}" }} restarted
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }} times in the last 15m on cluster {{ .Values.clusterRegion }}.
+        summary: Pod restart spike detected ({{ .Values.clusterRegion }})
+      expr: |-
+        increase(kube_pod_container_status_restarts_total{
+          cluster_region="{{ .Values.clusterRegion }}"
+        }[15m]) > {{ .Values.rules.workload.podRestartWarningThreshold }}
+      for: 0m
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubePodRestartSpike
+      annotations:
+        description: >
+          Pod {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.pod {{ "}}" }}
+          container {{ "{{" }} $labels.container {{ "}}" }} restarted
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }} times in the last 15m on cluster {{ .Values.clusterRegion }}.
+          Immediate action required.
+        summary: Pod restart spike critical ({{ .Values.clusterRegion }})
+      expr: |-
+        increase(kube_pod_container_status_restarts_total{
+          cluster_region="{{ .Values.clusterRegion }}"
+        }[15m]) > {{ .Values.rules.workload.podRestartCriticalThreshold }}
+      for: 0m
+      labels:
+        severity: critical
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubePodNotReadyRatioHigh
+      annotations:
+        description: >
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% of pods in namespace
+          {{ "{{" }} $labels.namespace {{ "}}" }} are not ready on cluster {{ .Values.clusterRegion }}.
+        summary: High pod not-ready ratio ({{ .Values.clusterRegion }})
+      expr: |-
+        (
+          count by (namespace, cluster_region) (
+            kube_pod_status_ready{
+              condition="false",
+              cluster_region="{{ .Values.clusterRegion }}"
+            } == 1
+          )
+          /
+          count by (namespace, cluster_region) (
+            kube_pod_status_ready{
+              cluster_region="{{ .Values.clusterRegion }}"
+            }
+          )
+        ) * 100 > {{ .Values.rules.workload.podNotReadyWarningThreshold }}
+      for: 10m
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubePodNotReadyRatioHigh
+      annotations:
+        description: >
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% of pods in namespace
+          {{ "{{" }} $labels.namespace {{ "}}" }} are not ready on cluster {{ .Values.clusterRegion }}.
+          Immediate action required.
+        summary: Critical pod not-ready ratio ({{ .Values.clusterRegion }})
+      expr: |-
+        (
+          count by (namespace, cluster_region) (
+            kube_pod_status_ready{
+              condition="false",
+              cluster_region="{{ .Values.clusterRegion }}"
+            } == 1
+          )
+          /
+          count by (namespace, cluster_region) (
+            kube_pod_status_ready{
+              cluster_region="{{ .Values.clusterRegion }}"
+            }
+          )
+        ) * 100 > {{ .Values.rules.workload.podNotReadyCriticalThreshold }}
+      for: 10m
+      labels:
+        severity: critical
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeWorkloadUnavailableRatioHigh
+      annotations:
+        description: >
+          Deployment {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.deployment {{ "}}" }}
+          has {{ "{{" }} printf "%.0f" $value {{ "}}" }}% replicas unavailable on cluster {{ .Values.clusterRegion }}.
+        summary: Workload unavailable replica ratio high ({{ .Values.clusterRegion }})
+      expr: |-
+        (
+          kube_deployment_status_replicas_unavailable{
+            cluster_region="{{ .Values.clusterRegion }}"
+          }
+          /
+          kube_deployment_status_replicas{
+            cluster_region="{{ .Values.clusterRegion }}"
+          }
+        ) * 100 > {{ .Values.rules.workload.workloadUnavailableWarningThreshold }}
+      for: 10m
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeWorkloadUnavailableRatioHigh
+      annotations:
+        description: >
+          Deployment {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.deployment {{ "}}" }}
+          has {{ "{{" }} printf "%.0f" $value {{ "}}" }}% replicas unavailable on cluster {{ .Values.clusterRegion }}.
+          Immediate action required.
+        summary: Workload unavailable replica ratio critical ({{ .Values.clusterRegion }})
+      expr: |-
+        (
+          kube_deployment_status_replicas_unavailable{
+            cluster_region="{{ .Values.clusterRegion }}"
+          }
+          /
+          kube_deployment_status_replicas{
+            cluster_region="{{ .Values.clusterRegion }}"
+          }
+        ) * 100 > {{ .Values.rules.workload.workloadUnavailableCriticalThreshold }}
+      for: 10m
+      labels:
+        severity: critical
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeHPAMaxedReplicas
+      annotations:
+        description: >
+          HPA {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.horizontalpodautoscaler {{ "}}" }}
+          is at {{ "{{" }} printf "%.0f" $value {{ "}}" }}% of max replicas on cluster {{ .Values.clusterRegion }}.
+        summary: HPA near maximum replicas ({{ .Values.clusterRegion }})
+      expr: |-
+        (
+          kube_horizontalpodautoscaler_status_current_replicas{
+            cluster_region="{{ .Values.clusterRegion }}"
+          }
+          /
+          kube_horizontalpodautoscaler_spec_max_replicas{
+            cluster_region="{{ .Values.clusterRegion }}"
+          }
+        ) * 100 >= {{ .Values.rules.workload.hpaMaxedWarningRatio }}
+      for: 10m
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeHPAMaxedReplicas
+      annotations:
+        description: >
+          HPA {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.horizontalpodautoscaler {{ "}}" }}
+          has reached maximum replicas on cluster {{ .Values.clusterRegion }}.
+          Immediate action required.
+        summary: HPA at maximum replicas ({{ .Values.clusterRegion }})
+      expr: |-
+        (
+          kube_horizontalpodautoscaler_status_current_replicas{
+            cluster_region="{{ .Values.clusterRegion }}"
+          }
+          /
+          kube_horizontalpodautoscaler_spec_max_replicas{
+            cluster_region="{{ .Values.clusterRegion }}"
+          }
+        ) * 100 >= {{ .Values.rules.workload.hpaMaxedCriticalRatio }}
+      for: 10m
+      labels:
+        severity: critical
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeHPAScalingLimited
+      annotations:
+        description: >
+          HPA {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.horizontalpodautoscaler {{ "}}" }}
+          scaling is limited or failing on cluster {{ .Values.clusterRegion }}.
+        summary: HPA scaling limited or failing ({{ .Values.clusterRegion }})
+      expr: |-
+        kube_horizontalpodautoscaler_status_condition{
+          condition="ScalingLimited",
+          status="true",
+          cluster_region="{{ .Values.clusterRegion }}"
+        } == 1
+      for: 5m
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+{{- end }}

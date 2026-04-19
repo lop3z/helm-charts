@@ -130,4 +130,41 @@ spec:
       labels:
         severity: critical
         cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubePersistentVolumeGrowthAbnormal
+      annotations:
+        description: >
+          PVC {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.persistentvolumeclaim {{ "}}" }}
+          is growing at {{ "{{" }} printf "%.0f" $value {{ "}}" }}% per day on cluster {{ .Values.clusterRegion }}.
+        summary: PVC daily growth rate abnormal ({{ .Values.clusterRegion }})
+      expr: |-
+        (
+          deriv(kubelet_volume_stats_used_bytes{cluster_region="{{ .Values.clusterRegion }}"}[1d])
+          * 86400
+          / kubelet_volume_stats_capacity_bytes{cluster_region="{{ .Values.clusterRegion }}"}
+          * 100
+        ) > {{ .Values.rules.pvc.growthRateWarning }}
+      for: 1h
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubePersistentVolumeGrowthAbnormal
+      annotations:
+        description: >
+          PVC {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.persistentvolumeclaim {{ "}}" }}
+          is growing at {{ "{{" }} printf "%.0f" $value {{ "}}" }}% per day on cluster {{ .Values.clusterRegion }}.
+          Immediate action required.
+        summary: PVC daily growth rate critically high ({{ .Values.clusterRegion }})
+      expr: |-
+        (
+          deriv(kubelet_volume_stats_used_bytes{cluster_region="{{ .Values.clusterRegion }}"}[1d])
+          * 86400
+          / kubelet_volume_stats_capacity_bytes{cluster_region="{{ .Values.clusterRegion }}"}
+          * 100
+        ) > {{ .Values.rules.pvc.growthRateCritical }}
+      for: 1h
+      labels:
+        severity: critical
+        cluster_region: {{ .Values.clusterRegion }}
 {{- end }}

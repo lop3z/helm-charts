@@ -1,0 +1,165 @@
+{{- if .Values.rules.kubeApi.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ .Release.Name }}-kube-api
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kube-prometheus-rules.labels" . | nindent 4 }}
+    gitops.jenkins-x.io/pipeline: namespaces
+spec:
+  groups:
+  - name: kubernetes.api
+    rules:
+    - alert: KubeAPILatencyHigh
+      annotations:
+        description: >
+          Kubernetes API server p99 latency for {{ "{{" }} $labels.verb {{ "}}" }}
+          {{ "{{" }} $labels.resource {{ "}}" }} is {{ "{{" }} printf "%.2f" $value {{ "}}" }}s
+          on cluster {{ .Values.clusterRegion }}.
+        summary: Kubernetes API server p99 latency high ({{ .Values.clusterRegion }})
+        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeapilatencyhigh
+      expr: |-
+        histogram_quantile(0.99,
+          sum by (verb, resource, le) (
+            rate(apiserver_request_duration_seconds_bucket{
+              verb!~"WATCH|CONNECT"
+            }[5m])
+          )
+        ) > {{ .Values.rules.kubeApi.latencyWarningSeconds }}
+      for: 5m
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeAPILatencyHigh
+      annotations:
+        description: >
+          Kubernetes API server p99 latency for {{ "{{" }} $labels.verb {{ "}}" }}
+          {{ "{{" }} $labels.resource {{ "}}" }} is {{ "{{" }} printf "%.2f" $value {{ "}}" }}s
+          on cluster {{ .Values.clusterRegion }}.
+          Immediate action required.
+        summary: Kubernetes API server p99 latency critical ({{ .Values.clusterRegion }})
+        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeapilatencyhigh
+      expr: |-
+        histogram_quantile(0.99,
+          sum by (verb, resource, le) (
+            rate(apiserver_request_duration_seconds_bucket{
+              verb!~"WATCH|CONNECT"
+            }[5m])
+          )
+        ) > {{ .Values.rules.kubeApi.latencyCriticalSeconds }}
+      for: 5m
+      labels:
+        severity: critical
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeAPIErrorRatioHigh
+      annotations:
+        description: >
+          Kubernetes API server error ratio is {{ "{{" }} printf "%.2f" $value {{ "}}" }}%
+          on cluster {{ .Values.clusterRegion }}.
+        summary: Kubernetes API server error ratio high ({{ .Values.clusterRegion }})
+        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeapierrorstoohigh
+      expr: |-
+        (
+          sum(rate(apiserver_request_total{code=~"5.."}[5m]))
+          /
+          sum(rate(apiserver_request_total[5m]))
+        ) * 100 > {{ .Values.rules.kubeApi.errorRatioWarning }}
+      for: 5m
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeAPIErrorRatioHigh
+      annotations:
+        description: >
+          Kubernetes API server error ratio is {{ "{{" }} printf "%.2f" $value {{ "}}" }}%
+          on cluster {{ .Values.clusterRegion }}.
+          Immediate action required.
+        summary: Kubernetes API server error ratio critical ({{ .Values.clusterRegion }})
+        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubeapierrorstoohigh
+      expr: |-
+        (
+          sum(rate(apiserver_request_total{code=~"5.."}[5m]))
+          /
+          sum(rate(apiserver_request_total[5m]))
+        ) * 100 > {{ .Values.rules.kubeApi.errorRatioCritical }}
+      for: 5m
+      labels:
+        severity: critical
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeJobFailed
+      annotations:
+        description: >
+          Job {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.job_name {{ "}}" }}
+          has {{ "{{" }} printf "%.0f" $value {{ "}}" }} failed pods on cluster {{ .Values.clusterRegion }}.
+        summary: Kubernetes Job has failures ({{ .Values.clusterRegion }})
+        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubejobfailed
+      expr: |-
+        sum by (namespace, job_name, cluster_region) (
+          increase(kube_job_status_failed{
+            cluster_region="{{ .Values.clusterRegion }}"
+          }[30m])
+        ) >= {{ .Values.rules.kubeApi.jobFailedWarning }}
+      for: 0m
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeJobFailed
+      annotations:
+        description: >
+          Job {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.job_name {{ "}}" }}
+          has {{ "{{" }} printf "%.0f" $value {{ "}}" }} failed pods on cluster {{ .Values.clusterRegion }}.
+          Immediate action required.
+        summary: Kubernetes Job has critical failures ({{ .Values.clusterRegion }})
+        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubejobfailed
+      expr: |-
+        sum by (namespace, job_name, cluster_region) (
+          increase(kube_job_status_failed{
+            cluster_region="{{ .Values.clusterRegion }}"
+          }[30m])
+        ) >= {{ .Values.rules.kubeApi.jobFailedCritical }}
+      for: 0m
+      labels:
+        severity: critical
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeCronJobMissedSchedule
+      annotations:
+        description: >
+          CronJob {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.cronjob {{ "}}" }}
+          has not been scheduled for {{ "{{" }} printf "%.0f" $value {{ "}}" }}s
+          on cluster {{ .Values.clusterRegion }}.
+        summary: CronJob missed schedule ({{ .Values.clusterRegion }})
+        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubecronjobrunning
+      expr: |-
+        time() - kube_cronjob_status_last_schedule_time{
+          cluster_region="{{ .Values.clusterRegion }}"
+        } > {{ .Values.rules.kubeApi.cronJobMissedWarningSeconds }}
+      for: 0m
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeCronJobMissedSchedule
+      annotations:
+        description: >
+          CronJob {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.cronjob {{ "}}" }}
+          has not been scheduled for {{ "{{" }} printf "%.0f" $value {{ "}}" }}s
+          on cluster {{ .Values.clusterRegion }}.
+          Immediate action required.
+        summary: CronJob missed schedule critically overdue ({{ .Values.clusterRegion }})
+        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubecronjobrunning
+      expr: |-
+        time() - kube_cronjob_status_last_schedule_time{
+          cluster_region="{{ .Values.clusterRegion }}"
+        } > {{ .Values.rules.kubeApi.cronJobMissedCriticalSeconds }}
+      for: 0m
+      labels:
+        severity: critical
+        cluster_region: {{ .Values.clusterRegion }}
+{{- end }}

@@ -1,0 +1,135 @@
+{{- if .Values.rules.targets.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ .Release.Name }}-targets
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kube-prometheus-rules.labels" . | nindent 4 }}
+    gitops.jenkins-x.io/pipeline: namespaces
+spec:
+  groups:
+  - name: kubernetes.targets
+    rules:
+    - alert: KubeScrapeTargetDown
+      annotations:
+        description: >
+          Scrape target {{ "{{" }} $labels.job {{ "}}" }} instance {{ "{{" }} $labels.instance {{ "}}" }}
+          is down on cluster {{ .Values.clusterRegion }}.
+        summary: Scrape target down ({{ .Values.clusterRegion }})
+      expr: |-
+        up{cluster_region="{{ .Values.clusterRegion }}"} == 0
+      for: 2m
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeScrapeTargetDown
+      annotations:
+        description: >
+          Scrape target {{ "{{" }} $labels.job {{ "}}" }} instance {{ "{{" }} $labels.instance {{ "}}" }}
+          has been down for 5m on cluster {{ .Values.clusterRegion }}.
+          Immediate action required.
+        summary: Scrape target persistently down ({{ .Values.clusterRegion }})
+      expr: |-
+        up{cluster_region="{{ .Values.clusterRegion }}"} == 0
+      for: 5m
+      labels:
+        severity: critical
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeScrapeErrorRatioHigh
+      annotations:
+        description: >
+          {{ "{{" }} printf "%.1f" $value {{ "}}" }}% of scrape targets are down
+          on cluster {{ .Values.clusterRegion }}.
+        summary: High scrape error ratio ({{ .Values.clusterRegion }})
+      expr: |-
+        (
+          count(up{cluster_region="{{ .Values.clusterRegion }}"} == 0)
+          /
+          count(up{cluster_region="{{ .Values.clusterRegion }}"})
+        ) * 100 > {{ .Values.rules.targets.scrapeErrorRatioWarning }}
+      for: 5m
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeScrapeErrorRatioHigh
+      annotations:
+        description: >
+          {{ "{{" }} printf "%.1f" $value {{ "}}" }}% of scrape targets are down
+          on cluster {{ .Values.clusterRegion }}.
+          Immediate action required.
+        summary: Critical scrape error ratio ({{ .Values.clusterRegion }})
+      expr: |-
+        (
+          count(up{cluster_region="{{ .Values.clusterRegion }}"} == 0)
+          /
+          count(up{cluster_region="{{ .Values.clusterRegion }}"})
+        ) * 100 > {{ .Values.rules.targets.scrapeErrorRatioCritical }}
+      for: 5m
+      labels:
+        severity: critical
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeHAProxyBackendDown
+      annotations:
+        description: >
+          HAProxy backend {{ "{{" }} $labels.proxy {{ "}}" }} is down
+          on cluster {{ .Values.clusterRegion }}.
+        summary: HAProxy backend down ({{ .Values.clusterRegion }})
+      expr: |-
+        haproxy_backend_status{
+          status="DOWN",
+          cluster_region="{{ .Values.clusterRegion }}"
+        } == 1
+      for: 2m
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeHAProxyBackendDown
+      annotations:
+        description: >
+          HAProxy backend {{ "{{" }} $labels.proxy {{ "}}" }} has been down for 5m
+          on cluster {{ .Values.clusterRegion }}.
+          Immediate action required.
+        summary: HAProxy backend persistently down ({{ .Values.clusterRegion }})
+      expr: |-
+        haproxy_backend_status{
+          status="DOWN",
+          cluster_region="{{ .Values.clusterRegion }}"
+        } == 1
+      for: 5m
+      labels:
+        severity: critical
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeMongoDBExporterDown
+      annotations:
+        description: >
+          MongoDB exporter instance {{ "{{" }} $labels.instance {{ "}}" }} is down
+          on cluster {{ .Values.clusterRegion }}.
+        summary: MongoDB exporter down ({{ .Values.clusterRegion }})
+      expr: |-
+        mongodb_up{cluster_region="{{ .Values.clusterRegion }}"} == 0
+      for: 2m
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeMongoDBExporterDown
+      annotations:
+        description: >
+          MongoDB exporter instance {{ "{{" }} $labels.instance {{ "}}" }} has been down for 5m
+          on cluster {{ .Values.clusterRegion }}.
+          Immediate action required.
+        summary: MongoDB exporter persistently down ({{ .Values.clusterRegion }})
+      expr: |-
+        mongodb_up{cluster_region="{{ .Values.clusterRegion }}"} == 0
+      for: 5m
+      labels:
+        severity: critical
+        cluster_region: {{ .Values.clusterRegion }}
+{{- end }}
