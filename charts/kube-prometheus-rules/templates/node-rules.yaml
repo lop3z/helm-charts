@@ -247,4 +247,49 @@ spec:
       labels:
         severity: warning
         cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeNodeLoadHigh
+      annotations:
+        description: >
+          Node {{ "{{" }} $labels.instance {{ "}}" }} normalized load is
+          {{ "{{" }} printf "%.2f" $value {{ "}}" }}x on cluster {{ .Values.clusterRegion }}.
+        summary: Node load saturation high ({{ .Values.clusterRegion }})
+      expr: |-
+        (
+          node_load5{cluster_region="{{ .Values.clusterRegion }}"}
+          /
+          count by (instance, cluster_region) (
+            node_cpu_seconds_total{
+              mode="idle",
+              cluster_region="{{ .Values.clusterRegion }}"
+            }
+          )
+        ) > {{ .Values.rules.node.loadWarningRatio }}
+      for: 10m
+      labels:
+        severity: warning
+        cluster_region: {{ .Values.clusterRegion }}
+
+    - alert: KubeNodeLoadHigh
+      annotations:
+        description: >
+          Node {{ "{{" }} $labels.instance {{ "}}" }} normalized load is
+          {{ "{{" }} printf "%.2f" $value {{ "}}" }}x on cluster {{ .Values.clusterRegion }}.
+          Immediate action required.
+        summary: Node load critically saturated ({{ .Values.clusterRegion }})
+      expr: |-
+        (
+          node_load5{cluster_region="{{ .Values.clusterRegion }}"}
+          /
+          count by (instance, cluster_region) (
+            node_cpu_seconds_total{
+              mode="idle",
+              cluster_region="{{ .Values.clusterRegion }}"
+            }
+          )
+        ) > {{ .Values.rules.node.loadCriticalRatio }}
+      for: 10m
+      labels:
+        severity: critical
+        cluster_region: {{ .Values.clusterRegion }}
 {{- end }}

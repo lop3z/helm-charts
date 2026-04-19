@@ -17,6 +17,9 @@ rules:
     inodeCriticalThreshold: 85
     # Warning: PVC predicted to be full within this many hours
     predictFullInHours: 96
+    # PVC daily growth rate thresholds (%)
+    growthRateWarning: 10
+    growthRateCritical: 20
 
   node:
     enabled: true
@@ -32,3 +35,42 @@ rules:
     # Root filesystem inode usage thresholds (%)
     inodeWarningThreshold: 85
     inodeCriticalThreshold: 95
+    # Normalized load (load5 / cpu_count) thresholds
+    loadWarningRatio: 1.20
+    loadCriticalRatio: 1.50
+
+  workload:
+    enabled: true
+    # Pod restart spike thresholds (count in 15m)
+    podRestartWarningThreshold: 5
+    podRestartCriticalThreshold: 10
+    # Pod not-ready ratio thresholds (%)
+    podNotReadyWarningThreshold: 10
+    podNotReadyCriticalThreshold: 30
+    # Deployment unavailable replica ratio thresholds (%)
+    workloadUnavailableWarningThreshold: 10
+    workloadUnavailableCriticalThreshold: 30
+    # HPA maxed replicas thresholds (%)
+    hpaMaxedWarningRatio: 90
+    hpaMaxedCriticalRatio: 100
+
+  kubeApi:
+    enabled: true
+    # API server p99 latency thresholds (seconds)
+    latencyWarningSeconds: 1.0
+    latencyCriticalSeconds: 2.0
+    # API server 5xx error ratio thresholds (%)
+    errorRatioWarning: 3
+    errorRatioCritical: 10
+    # Job failure thresholds (count in 30m)
+    jobFailedWarning: 1
+    jobFailedCritical: 3
+    # CronJob missed schedule thresholds (seconds since last schedule)
+    cronJobMissedWarningSeconds: 1800
+    cronJobMissedCriticalSeconds: 3600
+
+  targets:
+    enabled: true
+    # Scrape error ratio thresholds (% of targets down)
+    scrapeErrorRatioWarning: 5
+    scrapeErrorRatioCritical: 20
