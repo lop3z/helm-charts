@@ -4,6 +4,12 @@ clusterRegion: ""
 # Namespace to deploy PrometheusRule resources into
 namespace: jx-observability
 
+# Grafana dashboard — deploys a ConfigMap picked up by the Grafana sidecar
+dashboard:
+  enabled: true
+  # Grafana folder name (matched via grafana_folder annotation)
+  folder: Kubernetes
+
 rules:
   pvc:
     enabled: true

@@ -1,0 +1,15 @@
+{{- if .Values.dashboard.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-alert-overview
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kube-prometheus-rules.labels" . | nindent 4 }}
+    jenkins-x.io/grafana-dashboard: "1"
+  annotations:
+    grafana_folder: {{ .Values.dashboard.folder }}
+data:
+  alert-overview.json: |-
+{{ .Files.Get "files/alert-overview.json" | indent 4 }}
+{{- end }}
