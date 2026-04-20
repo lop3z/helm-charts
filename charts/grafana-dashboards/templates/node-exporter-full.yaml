@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-node-exporter-full
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "grafana-dashboards.labels" . | nindent 4 }}
+    jenkins-x.io/grafana-dashboard: "1"
+  annotations:
+    grafana_folder: {{ .Values.folder }}
+data:
+  node-exporter-full.json: |-
+{{ .Files.Get "files/node-exporter-full.json" | indent 4 }}
