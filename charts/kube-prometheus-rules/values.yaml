@@ -80,3 +80,10 @@ rules:
     # Scrape error ratio thresholds (% of targets down)
     scrapeErrorRatioWarning: 5
     scrapeErrorRatioCritical: 20
+
+  velero:
+    enabled: true
+    # Hours since last successful backup before warning (default: 25h — 1h grace after daily schedule)
+    staleWarningHours: 25
+    # Hours since last successful backup before critical (default: 49h — missed 2 consecutive runs)
+    staleCriticalHours: 49
