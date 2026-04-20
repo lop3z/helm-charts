@@ -1,5 +1,18 @@
 apiVersion: v1
 entries:
+  grafana-dashboards:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-04-20T09:03:00.346150485Z"
+    description: Grafana dashboards for Kubernetes observability — PVC, Node Exporter
+    digest: 9f92c0e5eeefb6e50c0cb8f14a149081710e10737db5d5c6b4d949ebb37f574a
+    maintainers:
+    - name: lop3z
+    name: grafana-dashboards
+    type: application
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/grafana-dashboards-0.1.0/grafana-dashboards-0.1.0.tgz
+    version: 0.1.0
   hyperping-exporter:
   - apiVersion: v2
     appVersion: 1.0.1
@@ -1907,4 +1920,4 @@ entries:
     urls:
     - https://github.com/lop3z/helm-charts/releases/download/wireguard-0.4.0/wireguard-0.4.0.tgz
     version: 0.4.0
-generated: "2026-04-20T07:30:25.012798095Z"
+generated: "2026-04-20T09:03:00.346378914Z"
