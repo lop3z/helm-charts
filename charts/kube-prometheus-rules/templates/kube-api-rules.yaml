@@ -18,8 +18,8 @@ spec:
           {{ "{{" }} $labels.resource {{ "}}" }} is {{ "{{" }} printf "%.2f" $value {{ "}}" }}s
           on cluster {{ .Values.clusterRegion }}.
         summary: Kubernetes API server p99 latency high ({{ .Values.clusterRegion }})
-        {{- if .Values.runbooks.kubeApi.latencyHigh }}
-        runbook_url: {{ .Values.runbooks.kubeApi.latencyHigh }}
+        {{- with (.Values.runbooks.kubeApi.latencyHigh | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
         {{- end }}
       expr: |-
         histogram_quantile(0.99,
@@ -42,8 +42,8 @@ spec:
           on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: Kubernetes API server p99 latency critical ({{ .Values.clusterRegion }})
-        {{- if .Values.runbooks.kubeApi.latencyHigh }}
-        runbook_url: {{ .Values.runbooks.kubeApi.latencyHigh }}
+        {{- with (.Values.runbooks.kubeApi.latencyHigh | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
         {{- end }}
       expr: |-
         histogram_quantile(0.99,
@@ -64,8 +64,8 @@ spec:
           Kubernetes API server error ratio is {{ "{{" }} printf "%.2f" $value {{ "}}" }}%
           on cluster {{ .Values.clusterRegion }}.
         summary: Kubernetes API server error ratio high ({{ .Values.clusterRegion }})
-        {{- if .Values.runbooks.kubeApi.errorRatioHigh }}
-        runbook_url: {{ .Values.runbooks.kubeApi.errorRatioHigh }}
+        {{- with (.Values.runbooks.kubeApi.errorRatioHigh | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
@@ -85,8 +85,8 @@ spec:
           on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: Kubernetes API server error ratio critical ({{ .Values.clusterRegion }})
-        {{- if .Values.runbooks.kubeApi.errorRatioHigh }}
-        runbook_url: {{ .Values.runbooks.kubeApi.errorRatioHigh }}
+        {{- with (.Values.runbooks.kubeApi.errorRatioHigh | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
@@ -105,8 +105,8 @@ spec:
           Job {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.job_name {{ "}}" }}
           has {{ "{{" }} printf "%.0f" $value {{ "}}" }} failed pods on cluster {{ .Values.clusterRegion }}.
         summary: Kubernetes Job has failures ({{ .Values.clusterRegion }})
-        {{- if .Values.runbooks.kubeApi.jobFailed }}
-        runbook_url: {{ .Values.runbooks.kubeApi.jobFailed }}
+        {{- with (.Values.runbooks.kubeApi.jobFailed | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
         {{- end }}
       expr: |-
         sum by (namespace, job_name, cluster_region) (
@@ -126,8 +126,8 @@ spec:
           has {{ "{{" }} printf "%.0f" $value {{ "}}" }} failed pods on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: Kubernetes Job has critical failures ({{ .Values.clusterRegion }})
-        {{- if .Values.runbooks.kubeApi.jobFailed }}
-        runbook_url: {{ .Values.runbooks.kubeApi.jobFailed }}
+        {{- with (.Values.runbooks.kubeApi.jobFailed | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
         {{- end }}
       expr: |-
         sum by (namespace, job_name, cluster_region) (
@@ -147,8 +147,8 @@ spec:
           has not been scheduled for {{ "{{" }} printf "%.0f" $value {{ "}}" }}s
           on cluster {{ .Values.clusterRegion }}.
         summary: CronJob missed schedule ({{ .Values.clusterRegion }})
-        {{- if .Values.runbooks.kubeApi.cronJobMissedSchedule }}
-        runbook_url: {{ .Values.runbooks.kubeApi.cronJobMissedSchedule }}
+        {{- with (.Values.runbooks.kubeApi.cronJobMissedSchedule | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
         {{- end }}
       expr: |-
         time() - kube_cronjob_status_last_schedule_time{
@@ -167,8 +167,8 @@ spec:
           on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: CronJob missed schedule critically overdue ({{ .Values.clusterRegion }})
-        {{- if .Values.runbooks.kubeApi.cronJobMissedSchedule }}
-        runbook_url: {{ .Values.runbooks.kubeApi.cronJobMissedSchedule }}
+        {{- with (.Values.runbooks.kubeApi.cronJobMissedSchedule | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
         {{- end }}
       expr: |-
         time() - kube_cronjob_status_last_schedule_time{
