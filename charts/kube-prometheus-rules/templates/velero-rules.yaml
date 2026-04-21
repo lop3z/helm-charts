@@ -18,6 +18,9 @@ spec:
           {{ "{{" }} printf "%.1f" $value {{ "}}" }}h ago on cluster {{ .Values.clusterRegion }}.
           Backup may have been skipped or failed.
         summary: Velero backup stale ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.velero.backupStale }}
+        runbook_url: {{ .Values.runbooks.velero.backupStale }}
+        {{- end }}
       expr: |-
         (
           time() - velero_backup_last_successful_timestamp{
@@ -37,6 +40,9 @@ spec:
           {{ "{{" }} printf "%.1f" $value {{ "}}" }}h ago on cluster {{ .Values.clusterRegion }}.
           Immediate action required — multiple consecutive backup runs may have failed.
         summary: Velero backup critically stale ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.velero.backupStale }}
+        runbook_url: {{ .Values.runbooks.velero.backupStale }}
+        {{- end }}
       expr: |-
         (
           time() - velero_backup_last_successful_timestamp{

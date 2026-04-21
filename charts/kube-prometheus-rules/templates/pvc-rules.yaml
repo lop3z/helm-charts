@@ -17,7 +17,9 @@ spec:
           PVC {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.persistentvolumeclaim {{ "}}" }}
           is {{ "{{" }} printf "%.0f" $value {{ "}}" }}% full on cluster {{ .Values.clusterRegion }}.
         summary: PVC is almost full ({{ .Values.clusterRegion }})
-        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubepersistentvolumefillingup
+        {{- if .Values.runbooks.pvc.fillingUp }}
+        runbook_url: {{ .Values.runbooks.pvc.fillingUp }}
+        {{- end }}
       expr: |-
         (
           kubelet_volume_stats_used_bytes{cluster_region="{{ .Values.clusterRegion }}"}
@@ -36,7 +38,9 @@ spec:
           is {{ "{{" }} printf "%.0f" $value {{ "}}" }}% full on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: PVC is critically full ({{ .Values.clusterRegion }})
-        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubepersistentvolumefillingup
+        {{- if .Values.runbooks.pvc.fillingUp }}
+        runbook_url: {{ .Values.runbooks.pvc.fillingUp }}
+        {{- end }}
       expr: |-
         (
           kubelet_volume_stats_used_bytes{cluster_region="{{ .Values.clusterRegion }}"}
@@ -54,7 +58,9 @@ spec:
           PVC {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.persistentvolumeclaim {{ "}}" }}
           inode usage is {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
         summary: PVC inodes almost exhausted ({{ .Values.clusterRegion }})
-        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubepersistentvolumeinodesfillingup
+        {{- if .Values.runbooks.pvc.inodesFillingUp }}
+        runbook_url: {{ .Values.runbooks.pvc.inodesFillingUp }}
+        {{- end }}
       expr: |-
         (
           kubelet_volume_stats_inodes_used{cluster_region="{{ .Values.clusterRegion }}"}
@@ -76,7 +82,9 @@ spec:
           inode usage is {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: PVC inodes critically exhausted ({{ .Values.clusterRegion }})
-        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubepersistentvolumeinodesfillingup
+        {{- if .Values.runbooks.pvc.inodesFillingUp }}
+        runbook_url: {{ .Values.runbooks.pvc.inodesFillingUp }}
+        {{- end }}
       expr: |-
         (
           kubelet_volume_stats_inodes_used{cluster_region="{{ .Values.clusterRegion }}"}
@@ -97,7 +105,9 @@ spec:
           PVC {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.persistentvolumeclaim {{ "}}" }}
           is predicted to fill up within {{ .Values.rules.pvc.predictFullInHours }} hours on cluster {{ .Values.clusterRegion }}.
         summary: PVC predicted to be full in {{ .Values.rules.pvc.predictFullInHours }}h ({{ .Values.clusterRegion }})
-        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubepersistentvolumefillingup
+        {{- if .Values.runbooks.pvc.fillingUpPredicted }}
+        runbook_url: {{ .Values.runbooks.pvc.fillingUpPredicted }}
+        {{- end }}
       expr: |-
         (
           kubelet_volume_stats_available_bytes{cluster_region="{{ .Values.clusterRegion }}"}
@@ -120,7 +130,9 @@ spec:
           PVC {{ "{{" }} $labels.persistentvolumeclaim {{ "}}" }} is in {{ "{{" }} $labels.phase {{ "}}" }}
           phase on cluster {{ .Values.clusterRegion }}.
         summary: PVC in Failed or Pending state ({{ .Values.clusterRegion }})
-        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubepersistentvolumeerrors
+        {{- if .Values.runbooks.pvc.errors }}
+        runbook_url: {{ .Values.runbooks.pvc.errors }}
+        {{- end }}
       expr: |-
         kube_persistentvolume_status_phase{
           phase=~"Failed|Pending",
@@ -137,6 +149,9 @@ spec:
           PVC {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.persistentvolumeclaim {{ "}}" }}
           is growing at {{ "{{" }} printf "%.0f" $value {{ "}}" }}% per day on cluster {{ .Values.clusterRegion }}.
         summary: PVC daily growth rate abnormal ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.pvc.growthAbnormal }}
+        runbook_url: {{ .Values.runbooks.pvc.growthAbnormal }}
+        {{- end }}
       expr: |-
         (
           deriv(kubelet_volume_stats_used_bytes{cluster_region="{{ .Values.clusterRegion }}"}[1d])
@@ -156,6 +171,9 @@ spec:
           is growing at {{ "{{" }} printf "%.0f" $value {{ "}}" }}% per day on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: PVC daily growth rate critically high ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.pvc.growthAbnormal }}
+        runbook_url: {{ .Values.runbooks.pvc.growthAbnormal }}
+        {{- end }}
       expr: |-
         (
           deriv(kubelet_volume_stats_used_bytes{cluster_region="{{ .Values.clusterRegion }}"}[1d])

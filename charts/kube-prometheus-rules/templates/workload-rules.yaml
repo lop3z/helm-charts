@@ -18,6 +18,9 @@ spec:
           container {{ "{{" }} $labels.container {{ "}}" }} restarted
           {{ "{{" }} printf "%.0f" $value {{ "}}" }} times in the last 15m on cluster {{ .Values.clusterRegion }}.
         summary: Pod restart spike detected ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.workload.podRestartSpike }}
+        runbook_url: {{ .Values.runbooks.workload.podRestartSpike }}
+        {{- end }}
       expr: |-
         increase(kube_pod_container_status_restarts_total{
           cluster_region="{{ .Values.clusterRegion }}"
@@ -35,6 +38,9 @@ spec:
           {{ "{{" }} printf "%.0f" $value {{ "}}" }} times in the last 15m on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: Pod restart spike critical ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.workload.podRestartSpike }}
+        runbook_url: {{ .Values.runbooks.workload.podRestartSpike }}
+        {{- end }}
       expr: |-
         increase(kube_pod_container_status_restarts_total{
           cluster_region="{{ .Values.clusterRegion }}"
@@ -50,6 +56,9 @@ spec:
           {{ "{{" }} printf "%.0f" $value {{ "}}" }}% of pods in namespace
           {{ "{{" }} $labels.namespace {{ "}}" }} are not ready on cluster {{ .Values.clusterRegion }}.
         summary: High pod not-ready ratio ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.workload.podNotReady }}
+        runbook_url: {{ .Values.runbooks.workload.podNotReady }}
+        {{- end }}
       expr: |-
         (
           count by (namespace, cluster_region) (
@@ -77,6 +86,9 @@ spec:
           {{ "{{" }} $labels.namespace {{ "}}" }} are not ready on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: Critical pod not-ready ratio ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.workload.podNotReady }}
+        runbook_url: {{ .Values.runbooks.workload.podNotReady }}
+        {{- end }}
       expr: |-
         (
           count by (namespace, cluster_region) (
@@ -103,6 +115,9 @@ spec:
           Deployment {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.deployment {{ "}}" }}
           has {{ "{{" }} printf "%.0f" $value {{ "}}" }}% replicas unavailable on cluster {{ .Values.clusterRegion }}.
         summary: Workload unavailable replica ratio high ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.workload.workloadUnavailable }}
+        runbook_url: {{ .Values.runbooks.workload.workloadUnavailable }}
+        {{- end }}
       expr: |-
         (
           kube_deployment_status_replicas_unavailable{
@@ -125,6 +140,9 @@ spec:
           has {{ "{{" }} printf "%.0f" $value {{ "}}" }}% replicas unavailable on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: Workload unavailable replica ratio critical ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.workload.workloadUnavailable }}
+        runbook_url: {{ .Values.runbooks.workload.workloadUnavailable }}
+        {{- end }}
       expr: |-
         (
           kube_deployment_status_replicas_unavailable{
@@ -146,6 +164,9 @@ spec:
           HPA {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.horizontalpodautoscaler {{ "}}" }}
           is at {{ "{{" }} printf "%.0f" $value {{ "}}" }}% of max replicas on cluster {{ .Values.clusterRegion }}.
         summary: HPA near maximum replicas ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.workload.hpaMaxedReplicas }}
+        runbook_url: {{ .Values.runbooks.workload.hpaMaxedReplicas }}
+        {{- end }}
       expr: |-
         (
           kube_horizontalpodautoscaler_status_current_replicas{
@@ -168,6 +189,9 @@ spec:
           has reached maximum replicas on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: HPA at maximum replicas ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.workload.hpaMaxedReplicas }}
+        runbook_url: {{ .Values.runbooks.workload.hpaMaxedReplicas }}
+        {{- end }}
       expr: |-
         (
           kube_horizontalpodautoscaler_status_current_replicas{
@@ -189,6 +213,9 @@ spec:
           HPA {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.horizontalpodautoscaler {{ "}}" }}
           scaling is limited or failing on cluster {{ .Values.clusterRegion }}.
         summary: HPA scaling limited or failing ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.workload.hpaScalingLimited }}
+        runbook_url: {{ .Values.runbooks.workload.hpaScalingLimited }}
+        {{- end }}
       expr: |-
         kube_horizontalpodautoscaler_status_condition{
           condition="ScalingLimited",

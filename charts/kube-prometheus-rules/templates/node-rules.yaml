@@ -17,6 +17,9 @@ spec:
           Node {{ "{{" }} $labels.instance {{ "}}" }} memory usage is
           {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
         summary: Node memory usage high ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.node.memoryHigh }}
+        runbook_url: {{ .Values.runbooks.node.memoryHigh }}
+        {{- end }}
       expr: |-
         (
           1 - (
@@ -36,6 +39,9 @@ spec:
           {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: Node memory critically high ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.node.memoryHigh }}
+        runbook_url: {{ .Values.runbooks.node.memoryHigh }}
+        {{- end }}
       expr: |-
         (
           1 - (
@@ -54,6 +60,9 @@ spec:
           Node {{ "{{" }} $labels.instance {{ "}}" }} CPU usage is
           {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
         summary: Node CPU saturation ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.node.cpuSaturation }}
+        runbook_url: {{ .Values.runbooks.node.cpuSaturation }}
+        {{- end }}
       expr: |-
         (
           1 - avg by (instance, cluster_region) (
@@ -75,6 +84,9 @@ spec:
           {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: Node CPU critically saturated ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.node.cpuSaturation }}
+        runbook_url: {{ .Values.runbooks.node.cpuSaturation }}
+        {{- end }}
       expr: |-
         (
           1 - avg by (instance, cluster_region) (
@@ -95,7 +107,9 @@ spec:
           Node {{ "{{" }} $labels.instance {{ "}}" }} root filesystem is
           {{ "{{" }} printf "%.0f" $value {{ "}}" }}% full on cluster {{ .Values.clusterRegion }}.
         summary: Node root filesystem almost full ({{ .Values.clusterRegion }})
-        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/node/nodefilesystemalmostoutofspace
+        {{- if .Values.runbooks.node.filesystemAlmostFull }}
+        runbook_url: {{ .Values.runbooks.node.filesystemAlmostFull }}
+        {{- end }}
       expr: |-
         (
           1 - (
@@ -123,7 +137,9 @@ spec:
           {{ "{{" }} printf "%.0f" $value {{ "}}" }}% full on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: Node root filesystem critically full ({{ .Values.clusterRegion }})
-        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/node/nodefilesystemalmostoutofspace
+        {{- if .Values.runbooks.node.filesystemAlmostFull }}
+        runbook_url: {{ .Values.runbooks.node.filesystemAlmostFull }}
+        {{- end }}
       expr: |-
         (
           1 - (
@@ -150,6 +166,9 @@ spec:
           Node {{ "{{" }} $labels.instance {{ "}}" }} inode usage is
           {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
         summary: Node root filesystem inode saturation ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.node.inodesSaturation }}
+        runbook_url: {{ .Values.runbooks.node.inodesSaturation }}
+        {{- end }}
       expr: |-
         (
           1 - (
@@ -177,6 +196,9 @@ spec:
           {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: Node root filesystem inodes critically saturated ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.node.inodesSaturation }}
+        runbook_url: {{ .Values.runbooks.node.inodesSaturation }}
+        {{- end }}
       expr: |-
         (
           1 - (
@@ -203,7 +225,9 @@ spec:
           Node {{ "{{" }} $labels.instance {{ "}}" }} root filesystem is predicted to fill up
           within 24 hours on cluster {{ .Values.clusterRegion }}.
         summary: Node root filesystem predicted to be full in 24h ({{ .Values.clusterRegion }})
-        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/node/nodefilesystemspacefillingup
+        {{- if .Values.runbooks.node.filesystemSpaceFillingUp }}
+        runbook_url: {{ .Values.runbooks.node.filesystemSpaceFillingUp }}
+        {{- end }}
       expr: |-
         (
           node_filesystem_avail_bytes{
@@ -236,7 +260,9 @@ spec:
           Node {{ "{{" }} $labels.node {{ "}}" }} has {{ "{{" }} $labels.condition {{ "}}" }}
           pressure on cluster {{ .Values.clusterRegion }}.
         summary: Node pressure condition active ({{ .Values.clusterRegion }})
-        runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubenodepressure
+        {{- if .Values.runbooks.node.pressure }}
+        runbook_url: {{ .Values.runbooks.node.pressure }}
+        {{- end }}
       expr: |-
         kube_node_status_condition{
           condition=~"MemoryPressure|DiskPressure|PIDPressure",
@@ -254,6 +280,9 @@ spec:
           Node {{ "{{" }} $labels.instance {{ "}}" }} normalized load is
           {{ "{{" }} printf "%.2f" $value {{ "}}" }}x on cluster {{ .Values.clusterRegion }}.
         summary: Node load saturation high ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.node.loadHigh }}
+        runbook_url: {{ .Values.runbooks.node.loadHigh }}
+        {{- end }}
       expr: |-
         (
           node_load5{cluster_region="{{ .Values.clusterRegion }}"}
@@ -277,6 +306,9 @@ spec:
           {{ "{{" }} printf "%.2f" $value {{ "}}" }}x on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: Node load critically saturated ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.node.loadHigh }}
+        runbook_url: {{ .Values.runbooks.node.loadHigh }}
+        {{- end }}
       expr: |-
         (
           node_load5{cluster_region="{{ .Values.clusterRegion }}"}

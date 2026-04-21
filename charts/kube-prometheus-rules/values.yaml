@@ -87,3 +87,39 @@ rules:
     staleWarningHours: 25
     # Hours since last successful backup before critical (default: 49h — missed 2 consecutive runs)
     staleCriticalHours: 49
+
+# Runbook URLs for each alert — set to your internal Notion/Confluence pages in the version stream.
+# Leave empty ("") to omit the runbook_url annotation from the PrometheusRule.
+runbooks:
+  node:
+    memoryHigh: ""
+    cpuSaturation: ""
+    filesystemAlmostFull: ""
+    inodesSaturation: ""
+    filesystemSpaceFillingUp: ""
+    pressure: ""
+    loadHigh: ""
+  pvc:
+    fillingUp: ""
+    inodesFillingUp: ""
+    fillingUpPredicted: ""
+    errors: ""
+    growthAbnormal: ""
+  workload:
+    podRestartSpike: ""
+    podNotReady: ""
+    workloadUnavailable: ""
+    hpaMaxedReplicas: ""
+    hpaScalingLimited: ""
+  targets:
+    scrapeTargetDown: ""
+    scrapeErrorRatio: ""
+    haproxyBackendDown: ""
+    mongodbExporterDown: ""
+  kubeApi:
+    latencyHigh: ""
+    errorRatioHigh: ""
+    jobFailed: ""
+    cronJobMissedSchedule: ""
+  velero:
+    backupStale: ""
