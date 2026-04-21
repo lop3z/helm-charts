@@ -17,8 +17,8 @@ spec:
           Node {{ "{{" }} $labels.instance {{ "}}" }} memory usage is
           {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
         summary: Node memory usage high ({{ .Values.clusterRegion }})
-        {{- if .Values.runbooks.node.memoryHigh }}
-        runbook_url: {{ .Values.runbooks.node.memoryHigh }}
+        {{- with (.Values.runbooks.node.memoryHigh | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
@@ -39,8 +39,8 @@ spec:
           {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: Node memory critically high ({{ .Values.clusterRegion }})
-        {{- if .Values.runbooks.node.memoryHigh }}
-        runbook_url: {{ .Values.runbooks.node.memoryHigh }}
+        {{- with (.Values.runbooks.node.memoryHigh | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
@@ -60,8 +60,8 @@ spec:
           Node {{ "{{" }} $labels.instance {{ "}}" }} CPU usage is
           {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
         summary: Node CPU saturation ({{ .Values.clusterRegion }})
-        {{- if .Values.runbooks.node.cpuSaturation }}
-        runbook_url: {{ .Values.runbooks.node.cpuSaturation }}
+        {{- with (.Values.runbooks.node.cpuSaturation | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
@@ -84,8 +84,8 @@ spec:
           {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: Node CPU critically saturated ({{ .Values.clusterRegion }})
-        {{- if .Values.runbooks.node.cpuSaturation }}
-        runbook_url: {{ .Values.runbooks.node.cpuSaturation }}
+        {{- with (.Values.runbooks.node.cpuSaturation | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
@@ -107,8 +107,8 @@ spec:
           Node {{ "{{" }} $labels.instance {{ "}}" }} root filesystem is
           {{ "{{" }} printf "%.0f" $value {{ "}}" }}% full on cluster {{ .Values.clusterRegion }}.
         summary: Node root filesystem almost full ({{ .Values.clusterRegion }})
-        {{- if .Values.runbooks.node.filesystemAlmostFull }}
-        runbook_url: {{ .Values.runbooks.node.filesystemAlmostFull }}
+        {{- with (.Values.runbooks.node.filesystemAlmostFull | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
@@ -137,8 +137,8 @@ spec:
           {{ "{{" }} printf "%.0f" $value {{ "}}" }}% full on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: Node root filesystem critically full ({{ .Values.clusterRegion }})
-        {{- if .Values.runbooks.node.filesystemAlmostFull }}
-        runbook_url: {{ .Values.runbooks.node.filesystemAlmostFull }}
+        {{- with (.Values.runbooks.node.filesystemAlmostFull | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
@@ -166,8 +166,8 @@ spec:
           Node {{ "{{" }} $labels.instance {{ "}}" }} inode usage is
           {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
         summary: Node root filesystem inode saturation ({{ .Values.clusterRegion }})
-        {{- if .Values.runbooks.node.inodesSaturation }}
-        runbook_url: {{ .Values.runbooks.node.inodesSaturation }}
+        {{- with (.Values.runbooks.node.inodesSaturation | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
@@ -196,8 +196,8 @@ spec:
           {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: Node root filesystem inodes critically saturated ({{ .Values.clusterRegion }})
-        {{- if .Values.runbooks.node.inodesSaturation }}
-        runbook_url: {{ .Values.runbooks.node.inodesSaturation }}
+        {{- with (.Values.runbooks.node.inodesSaturation | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
@@ -225,8 +225,8 @@ spec:
           Node {{ "{{" }} $labels.instance {{ "}}" }} root filesystem is predicted to fill up
           within 24 hours on cluster {{ .Values.clusterRegion }}.
         summary: Node root filesystem predicted to be full in 24h ({{ .Values.clusterRegion }})
-        {{- if .Values.runbooks.node.filesystemSpaceFillingUp }}
-        runbook_url: {{ .Values.runbooks.node.filesystemSpaceFillingUp }}
+        {{- with (.Values.runbooks.node.filesystemSpaceFillingUp | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
@@ -260,8 +260,8 @@ spec:
           Node {{ "{{" }} $labels.node {{ "}}" }} has {{ "{{" }} $labels.condition {{ "}}" }}
           pressure on cluster {{ .Values.clusterRegion }}.
         summary: Node pressure condition active ({{ .Values.clusterRegion }})
-        {{- if .Values.runbooks.node.pressure }}
-        runbook_url: {{ .Values.runbooks.node.pressure }}
+        {{- with (.Values.runbooks.node.pressure | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
         {{- end }}
       expr: |-
         kube_node_status_condition{
@@ -280,8 +280,8 @@ spec:
           Node {{ "{{" }} $labels.instance {{ "}}" }} normalized load is
           {{ "{{" }} printf "%.2f" $value {{ "}}" }}x on cluster {{ .Values.clusterRegion }}.
         summary: Node load saturation high ({{ .Values.clusterRegion }})
-        {{- if .Values.runbooks.node.loadHigh }}
-        runbook_url: {{ .Values.runbooks.node.loadHigh }}
+        {{- with (.Values.runbooks.node.loadHigh | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
@@ -306,8 +306,8 @@ spec:
           {{ "{{" }} printf "%.2f" $value {{ "}}" }}x on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: Node load critically saturated ({{ .Values.clusterRegion }})
-        {{- if .Values.runbooks.node.loadHigh }}
-        runbook_url: {{ .Values.runbooks.node.loadHigh }}
+        {{- with (.Values.runbooks.node.loadHigh | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (

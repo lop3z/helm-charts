@@ -91,6 +91,9 @@ rules:
 # Runbook URLs for each alert — set to your internal Notion/Confluence pages in the version stream.
 # Leave empty ("") to omit the runbook_url annotation from the PrometheusRule.
 runbooks:
+  # Fallback URL used when a specific alert's runbook URL is not set.
+  # Set this in the version stream to your general alerts runbook page.
+  default: ""
   node:
     memoryHigh: ""
     cpuSaturation: ""
