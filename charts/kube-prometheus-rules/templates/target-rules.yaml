@@ -17,6 +17,9 @@ spec:
           Scrape target {{ "{{" }} $labels.job {{ "}}" }} instance {{ "{{" }} $labels.instance {{ "}}" }}
           is down on cluster {{ .Values.clusterRegion }}.
         summary: Scrape target down ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.targets.scrapeTargetDown }}
+        runbook_url: {{ .Values.runbooks.targets.scrapeTargetDown }}
+        {{- end }}
       expr: |-
         up{cluster_region="{{ .Values.clusterRegion }}"} == 0
       for: 2m
@@ -31,6 +34,9 @@ spec:
           has been down for 5m on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: Scrape target persistently down ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.targets.scrapeTargetDown }}
+        runbook_url: {{ .Values.runbooks.targets.scrapeTargetDown }}
+        {{- end }}
       expr: |-
         up{cluster_region="{{ .Values.clusterRegion }}"} == 0
       for: 5m
@@ -44,6 +50,9 @@ spec:
           {{ "{{" }} printf "%.1f" $value {{ "}}" }}% of scrape targets are down
           on cluster {{ .Values.clusterRegion }}.
         summary: High scrape error ratio ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.targets.scrapeErrorRatio }}
+        runbook_url: {{ .Values.runbooks.targets.scrapeErrorRatio }}
+        {{- end }}
       expr: |-
         (
           count(up{cluster_region="{{ .Values.clusterRegion }}"} == 0)
@@ -62,6 +71,9 @@ spec:
           on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: Critical scrape error ratio ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.targets.scrapeErrorRatio }}
+        runbook_url: {{ .Values.runbooks.targets.scrapeErrorRatio }}
+        {{- end }}
       expr: |-
         (
           count(up{cluster_region="{{ .Values.clusterRegion }}"} == 0)
@@ -79,6 +91,9 @@ spec:
           HAProxy backend {{ "{{" }} $labels.proxy {{ "}}" }} is down
           on cluster {{ .Values.clusterRegion }}.
         summary: HAProxy backend down ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.targets.haproxyBackendDown }}
+        runbook_url: {{ .Values.runbooks.targets.haproxyBackendDown }}
+        {{- end }}
       expr: |-
         haproxy_backend_status{
           status="DOWN",
@@ -96,6 +111,9 @@ spec:
           on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: HAProxy backend persistently down ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.targets.haproxyBackendDown }}
+        runbook_url: {{ .Values.runbooks.targets.haproxyBackendDown }}
+        {{- end }}
       expr: |-
         haproxy_backend_status{
           status="DOWN",
@@ -112,6 +130,9 @@ spec:
           MongoDB exporter instance {{ "{{" }} $labels.instance {{ "}}" }} is down
           on cluster {{ .Values.clusterRegion }}.
         summary: MongoDB exporter down ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.targets.mongodbExporterDown }}
+        runbook_url: {{ .Values.runbooks.targets.mongodbExporterDown }}
+        {{- end }}
       expr: |-
         mongodb_up{cluster_region="{{ .Values.clusterRegion }}"} == 0
       for: 2m
@@ -126,6 +147,9 @@ spec:
           on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: MongoDB exporter persistently down ({{ .Values.clusterRegion }})
+        {{- if .Values.runbooks.targets.mongodbExporterDown }}
+        runbook_url: {{ .Values.runbooks.targets.mongodbExporterDown }}
+        {{- end }}
       expr: |-
         mongodb_up{cluster_region="{{ .Values.clusterRegion }}"} == 0
       for: 5m
