@@ -140,20 +140,22 @@ spec:
         severity: critical
         cluster_region: {{ .Values.clusterRegion }}
 
+    # Lateness = time() - next_schedule_time. Negative when on schedule (next run still in future),
+    # positive when overdue. Period-agnostic — works for hourly, daily, monthly cronjobs.
     - alert: KubeCronJobMissedSchedule
       annotations:
         description: >
           CronJob {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.cronjob {{ "}}" }}
-          has not been scheduled for {{ "{{" }} printf "%.0f" $value {{ "}}" }}s
+          is {{ "{{" }} printf "%.0f" $value {{ "}}" }}s past its scheduled run time
           on cluster {{ .Values.clusterRegion }}.
         summary: CronJob missed schedule ({{ .Values.clusterRegion }})
         {{- with (.Values.runbooks.kubeApi.cronJobMissedSchedule | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
-        time() - kube_cronjob_status_last_schedule_time{
+        time() - kube_cronjob_next_schedule_time{
           cluster_region="{{ .Values.clusterRegion }}"
-        } > {{ .Values.rules.kubeApi.cronJobMissedWarningSeconds }}
+        } > {{ .Values.rules.kubeApi.cronJobLateWarningSeconds }}
       for: 0m
       labels:
         severity: warning
@@ -163,7 +165,7 @@ spec:
       annotations:
         description: >
           CronJob {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.cronjob {{ "}}" }}
-          has not been scheduled for {{ "{{" }} printf "%.0f" $value {{ "}}" }}s
+          is {{ "{{" }} printf "%.0f" $value {{ "}}" }}s past its scheduled run time
           on cluster {{ .Values.clusterRegion }}.
           Immediate action required.
         summary: CronJob missed schedule critically overdue ({{ .Values.clusterRegion }})
@@ -171,9 +173,9 @@ spec:
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
-        time() - kube_cronjob_status_last_schedule_time{
+        time() - kube_cronjob_next_schedule_time{
           cluster_region="{{ .Values.clusterRegion }}"
-        } > {{ .Values.rules.kubeApi.cronJobMissedCriticalSeconds }}
+        } > {{ .Values.rules.kubeApi.cronJobLateCriticalSeconds }}
       for: 0m
       labels:
         severity: critical

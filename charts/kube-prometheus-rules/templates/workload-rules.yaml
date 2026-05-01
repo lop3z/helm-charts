@@ -59,19 +59,18 @@ spec:
         {{- with (.Values.runbooks.workload.podNotReady | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
+      # Only count pods in Running phase that aren't Ready — excludes Succeeded/Failed
+      # pods (e.g. completed Job pods in jx-git-operator that linger as Ready=false).
       expr: |-
         (
           count by (namespace, cluster_region) (
-            kube_pod_status_ready{
-              condition="false",
-              cluster_region="{{ .Values.clusterRegion }}"
-            } == 1
+            (kube_pod_status_phase{phase="Running",cluster_region="{{ .Values.clusterRegion }}"} == 1)
+            unless on (namespace, pod, cluster_region)
+            (kube_pod_status_ready{condition="true",cluster_region="{{ .Values.clusterRegion }}"} == 1)
           )
           /
           count by (namespace, cluster_region) (
-            kube_pod_status_ready{
-              cluster_region="{{ .Values.clusterRegion }}"
-            }
+            kube_pod_status_phase{phase="Running",cluster_region="{{ .Values.clusterRegion }}"} == 1
           )
         ) * 100 > {{ .Values.rules.workload.podNotReadyWarningThreshold }}
       for: 10m
@@ -92,16 +91,13 @@ spec:
       expr: |-
         (
           count by (namespace, cluster_region) (
-            kube_pod_status_ready{
-              condition="false",
-              cluster_region="{{ .Values.clusterRegion }}"
-            } == 1
+            (kube_pod_status_phase{phase="Running",cluster_region="{{ .Values.clusterRegion }}"} == 1)
+            unless on (namespace, pod, cluster_region)
+            (kube_pod_status_ready{condition="true",cluster_region="{{ .Values.clusterRegion }}"} == 1)
           )
           /
           count by (namespace, cluster_region) (
-            kube_pod_status_ready{
-              cluster_region="{{ .Values.clusterRegion }}"
-            }
+            kube_pod_status_phase{phase="Running",cluster_region="{{ .Values.clusterRegion }}"} == 1
           )
         ) * 100 > {{ .Values.rules.workload.podNotReadyCriticalThreshold }}
       for: 10m
@@ -207,23 +203,4 @@ spec:
         severity: critical
         cluster_region: {{ .Values.clusterRegion }}
 
-    - alert: KubeHPAScalingLimited
-      annotations:
-        description: >
-          HPA {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.horizontalpodautoscaler {{ "}}" }}
-          scaling is limited or failing on cluster {{ .Values.clusterRegion }}.
-        summary: HPA scaling limited or failing ({{ .Values.clusterRegion }})
-        {{- with (.Values.runbooks.workload.hpaScalingLimited | default .Values.runbooks.default) }}
-        runbook_url: {{ . }}
-        {{- end }}
-      expr: |-
-        kube_horizontalpodautoscaler_status_condition{
-          condition="ScalingLimited",
-          status="true",
-          cluster_region="{{ .Values.clusterRegion }}"
-        } == 1
-      for: 5m
-      labels:
-        severity: warning
-        cluster_region: {{ .Values.clusterRegion }}
 {{- end }}
