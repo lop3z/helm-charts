@@ -286,7 +286,7 @@ spec:
       expr: |-
         (
           node_load5{cluster_region="{{ .Values.clusterRegion }}"}
-          /
+          / on(instance, cluster_region)
           count by (instance, cluster_region) (
             node_cpu_seconds_total{
               mode="idle",
@@ -312,7 +312,7 @@ spec:
       expr: |-
         (
           node_load5{cluster_region="{{ .Values.clusterRegion }}"}
-          /
+          / on(instance, cluster_region)
           count by (instance, cluster_region) (
             node_cpu_seconds_total{
               mode="idle",

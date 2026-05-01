@@ -71,9 +71,11 @@ rules:
     # Job failure thresholds (count in 30m)
     jobFailedWarning: 1
     jobFailedCritical: 3
-    # CronJob missed schedule thresholds (seconds since last schedule)
-    cronJobMissedWarningSeconds: 1800
-    cronJobMissedCriticalSeconds: 3600
+    # CronJob lateness thresholds (seconds past kube_cronjob_next_schedule_time —
+    # period-agnostic: works for hourly, daily, weekly cronjobs alike).
+    # Default: warn after 10m late, page after 30m late.
+    cronJobLateWarningSeconds: 600
+    cronJobLateCriticalSeconds: 1800
 
   targets:
     enabled: true
@@ -113,7 +115,6 @@ runbooks:
     podNotReady: ""
     workloadUnavailable: ""
     hpaMaxedReplicas: ""
-    hpaScalingLimited: ""
   targets:
     scrapeTargetDown: ""
     scrapeErrorRatio: ""
