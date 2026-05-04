@@ -15,43 +15,35 @@ spec:
       annotations:
         description: >
           Velero schedule {{ "{{" }} $labels.schedule {{ "}}" }} last successful backup was
-          {{ "{{" }} printf "%.1f" $value {{ "}}" }}h ago on cluster {{ .Values.clusterRegion }}.
+          {{ "{{" }} printf "%.1f" $value {{ "}}" }}h ago on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
           Backup may have been skipped or failed.
-        summary: Velero backup stale ({{ .Values.clusterRegion }})
+        summary: Velero backup stale ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.velero.backupStale | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
-          time() - velero_backup_last_successful_timestamp{
-            schedule!="",
-            cluster_region="{{ .Values.clusterRegion }}"
-          }
+          time() - velero_backup_last_successful_timestamp{schedule!=""}
         ) / 3600 > {{ .Values.rules.velero.staleWarningHours }}
       for: 0m
       labels:
         severity: warning
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: VeleroBackupStale
       annotations:
         description: >
           Velero schedule {{ "{{" }} $labels.schedule {{ "}}" }} last successful backup was
-          {{ "{{" }} printf "%.1f" $value {{ "}}" }}h ago on cluster {{ .Values.clusterRegion }}.
+          {{ "{{" }} printf "%.1f" $value {{ "}}" }}h ago on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
           Immediate action required — multiple consecutive backup runs may have failed.
-        summary: Velero backup critically stale ({{ .Values.clusterRegion }})
+        summary: Velero backup critically stale ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.velero.backupStale | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
-          time() - velero_backup_last_successful_timestamp{
-            schedule!="",
-            cluster_region="{{ .Values.clusterRegion }}"
-          }
+          time() - velero_backup_last_successful_timestamp{schedule!=""}
         ) / 3600 > {{ .Values.rules.velero.staleCriticalHours }}
       for: 0m
       labels:
         severity: wip
-        cluster_region: {{ .Values.clusterRegion }}
 {{- end }}

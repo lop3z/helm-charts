@@ -1,4 +1,8 @@
-# Cluster region label added to all PrometheusRule resources (e.g. sbg5, bhs5, sgp1, us-va1)
+# Cluster region of the deploy target — used only as a metadata.labels.cluster_region tag
+# on the PrometheusRule resource itself. Alert PromQL no longer filters by this value:
+# the rules evaluate against every cluster_region present in the metric store and propagate
+# the label from the firing series, so a single deployment on the observability cluster
+# (Mimir host) covers all regions whose metrics are remote_written into it.
 clusterRegion: ""
 
 # Namespace to deploy PrometheusRule resources into

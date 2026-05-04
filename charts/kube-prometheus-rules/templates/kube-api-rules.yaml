@@ -16,14 +16,14 @@ spec:
         description: >
           Kubernetes API server p99 latency for {{ "{{" }} $labels.verb {{ "}}" }}
           {{ "{{" }} $labels.resource {{ "}}" }} is {{ "{{" }} printf "%.2f" $value {{ "}}" }}s
-          on cluster {{ .Values.clusterRegion }}.
-        summary: Kubernetes API server p99 latency high ({{ .Values.clusterRegion }})
+          on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        summary: Kubernetes API server p99 latency high ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.kubeApi.latencyHigh | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         histogram_quantile(0.99,
-          sum by (verb, resource, le) (
+          sum by (cluster_region, verb, resource, le) (
             rate(apiserver_request_duration_seconds_bucket{
               verb!~"WATCH|CONNECT"
             }[5m])
@@ -32,22 +32,21 @@ spec:
       for: 5m
       labels:
         severity: warning
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeAPILatencyHigh
       annotations:
         description: >
           Kubernetes API server p99 latency for {{ "{{" }} $labels.verb {{ "}}" }}
           {{ "{{" }} $labels.resource {{ "}}" }} is {{ "{{" }} printf "%.2f" $value {{ "}}" }}s
-          on cluster {{ .Values.clusterRegion }}.
+          on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
           Immediate action required.
-        summary: Kubernetes API server p99 latency critical ({{ .Values.clusterRegion }})
+        summary: Kubernetes API server p99 latency critical ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.kubeApi.latencyHigh | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         histogram_quantile(0.99,
-          sum by (verb, resource, le) (
+          sum by (cluster_region, verb, resource, le) (
             rate(apiserver_request_duration_seconds_bucket{
               verb!~"WATCH|CONNECT"
             }[5m])
@@ -56,89 +55,80 @@ spec:
       for: 5m
       labels:
         severity: wip
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeAPIErrorRatioHigh
       annotations:
         description: >
           Kubernetes API server error ratio is {{ "{{" }} printf "%.2f" $value {{ "}}" }}%
-          on cluster {{ .Values.clusterRegion }}.
-        summary: Kubernetes API server error ratio high ({{ .Values.clusterRegion }})
+          on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        summary: Kubernetes API server error ratio high ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.kubeApi.errorRatioHigh | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
-          sum(rate(apiserver_request_total{code=~"5.."}[5m]))
+          sum by (cluster_region) (rate(apiserver_request_total{code=~"5.."}[5m]))
           /
-          sum(rate(apiserver_request_total[5m]))
+          sum by (cluster_region) (rate(apiserver_request_total[5m]))
         ) * 100 > {{ .Values.rules.kubeApi.errorRatioWarning }}
       for: 5m
       labels:
         severity: warning
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeAPIErrorRatioHigh
       annotations:
         description: >
           Kubernetes API server error ratio is {{ "{{" }} printf "%.2f" $value {{ "}}" }}%
-          on cluster {{ .Values.clusterRegion }}.
+          on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
           Immediate action required.
-        summary: Kubernetes API server error ratio critical ({{ .Values.clusterRegion }})
+        summary: Kubernetes API server error ratio critical ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.kubeApi.errorRatioHigh | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
-          sum(rate(apiserver_request_total{code=~"5.."}[5m]))
+          sum by (cluster_region) (rate(apiserver_request_total{code=~"5.."}[5m]))
           /
-          sum(rate(apiserver_request_total[5m]))
+          sum by (cluster_region) (rate(apiserver_request_total[5m]))
         ) * 100 > {{ .Values.rules.kubeApi.errorRatioCritical }}
       for: 5m
       labels:
         severity: wip
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeJobFailed
       annotations:
         description: >
           Job {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.job_name {{ "}}" }}
-          has {{ "{{" }} printf "%.0f" $value {{ "}}" }} failed pods on cluster {{ .Values.clusterRegion }}.
-        summary: Kubernetes Job has failures ({{ .Values.clusterRegion }})
+          has {{ "{{" }} printf "%.0f" $value {{ "}}" }} failed pods on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        summary: Kubernetes Job has failures ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.kubeApi.jobFailed | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
-        sum by (namespace, job_name, cluster_region) (
-          increase(kube_job_status_failed{
-            cluster_region="{{ .Values.clusterRegion }}"
-          }[30m])
+        sum by (cluster_region, namespace, job_name) (
+          increase(kube_job_status_failed[30m])
         ) >= {{ .Values.rules.kubeApi.jobFailedWarning }}
       for: 0m
       labels:
         severity: warning
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeJobFailed
       annotations:
         description: >
           Job {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.job_name {{ "}}" }}
-          has {{ "{{" }} printf "%.0f" $value {{ "}}" }} failed pods on cluster {{ .Values.clusterRegion }}.
+          has {{ "{{" }} printf "%.0f" $value {{ "}}" }} failed pods on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
           Immediate action required.
-        summary: Kubernetes Job has critical failures ({{ .Values.clusterRegion }})
+        summary: Kubernetes Job has critical failures ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.kubeApi.jobFailed | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
-        sum by (namespace, job_name, cluster_region) (
-          increase(kube_job_status_failed{
-            cluster_region="{{ .Values.clusterRegion }}"
-          }[30m])
+        sum by (cluster_region, namespace, job_name) (
+          increase(kube_job_status_failed[30m])
         ) >= {{ .Values.rules.kubeApi.jobFailedCritical }}
       for: 0m
       labels:
         severity: wip
-        cluster_region: {{ .Values.clusterRegion }}
 
     # Lateness = time() - next_schedule_time. Negative when on schedule (next run still in future),
     # positive when overdue. Period-agnostic — works for hourly, daily, monthly cronjobs.
@@ -147,37 +137,33 @@ spec:
         description: >
           CronJob {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.cronjob {{ "}}" }}
           is {{ "{{" }} printf "%.0f" $value {{ "}}" }}s past its scheduled run time
-          on cluster {{ .Values.clusterRegion }}.
-        summary: CronJob missed schedule ({{ .Values.clusterRegion }})
+          on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        summary: CronJob missed schedule ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.kubeApi.cronJobMissedSchedule | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
-        time() - kube_cronjob_next_schedule_time{
-          cluster_region="{{ .Values.clusterRegion }}"
-        } > {{ .Values.rules.kubeApi.cronJobLateWarningSeconds }}
+        time() - kube_cronjob_next_schedule_time
+          > {{ .Values.rules.kubeApi.cronJobLateWarningSeconds }}
       for: 0m
       labels:
         severity: warning
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeCronJobMissedSchedule
       annotations:
         description: >
           CronJob {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.cronjob {{ "}}" }}
           is {{ "{{" }} printf "%.0f" $value {{ "}}" }}s past its scheduled run time
-          on cluster {{ .Values.clusterRegion }}.
+          on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
           Immediate action required.
-        summary: CronJob missed schedule critically overdue ({{ .Values.clusterRegion }})
+        summary: CronJob missed schedule critically overdue ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.kubeApi.cronJobMissedSchedule | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
-        time() - kube_cronjob_next_schedule_time{
-          cluster_region="{{ .Values.clusterRegion }}"
-        } > {{ .Values.rules.kubeApi.cronJobLateCriticalSeconds }}
+        time() - kube_cronjob_next_schedule_time
+          > {{ .Values.rules.kubeApi.cronJobLateCriticalSeconds }}
       for: 0m
       labels:
         severity: wip
-        cluster_region: {{ .Values.clusterRegion }}
 {{- end }}

@@ -15,98 +15,88 @@ spec:
       annotations:
         description: >
           Node {{ "{{" }} $labels.instance {{ "}}" }} memory usage is
-          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
-        summary: Node memory usage high ({{ .Values.clusterRegion }})
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        summary: Node memory usage high ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.node.memoryHigh | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
           1 - (
-            node_memory_MemAvailable_bytes{cluster_region="{{ .Values.clusterRegion }}"}
-            / node_memory_MemTotal_bytes{cluster_region="{{ .Values.clusterRegion }}"}
+            node_memory_MemAvailable_bytes
+            / node_memory_MemTotal_bytes
           )
         ) * 100 > {{ .Values.rules.node.memoryWarningThreshold }}
       for: 5m
       labels:
         severity: warning
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeNodeMemoryHigh
       annotations:
         description: >
           Node {{ "{{" }} $labels.instance {{ "}}" }} memory usage is
-          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
           Immediate action required.
-        summary: Node memory critically high ({{ .Values.clusterRegion }})
+        summary: Node memory critically high ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.node.memoryHigh | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
           1 - (
-            node_memory_MemAvailable_bytes{cluster_region="{{ .Values.clusterRegion }}"}
-            / node_memory_MemTotal_bytes{cluster_region="{{ .Values.clusterRegion }}"}
+            node_memory_MemAvailable_bytes
+            / node_memory_MemTotal_bytes
           )
         ) * 100 > {{ .Values.rules.node.memoryCriticalThreshold }}
       for: 5m
       labels:
         severity: wip
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeNodeCPUSaturation
       annotations:
         description: >
           Node {{ "{{" }} $labels.instance {{ "}}" }} CPU usage is
-          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
-        summary: Node CPU saturation ({{ .Values.clusterRegion }})
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        summary: Node CPU saturation ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.node.cpuSaturation | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
-          1 - avg by (instance, cluster_region) (
-            rate(node_cpu_seconds_total{
-              mode="idle",
-              cluster_region="{{ .Values.clusterRegion }}"
-            }[5m])
+          1 - avg by (cluster_region, instance) (
+            rate(node_cpu_seconds_total{mode="idle"}[5m])
           )
         ) * 100 > {{ .Values.rules.node.cpuWarningThreshold }}
       for: 5m
       labels:
         severity: warning
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeNodeCPUSaturation
       annotations:
         description: >
           Node {{ "{{" }} $labels.instance {{ "}}" }} CPU usage is
-          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
           Immediate action required.
-        summary: Node CPU critically saturated ({{ .Values.clusterRegion }})
+        summary: Node CPU critically saturated ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.node.cpuSaturation | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
-          1 - avg by (instance, cluster_region) (
-            rate(node_cpu_seconds_total{
-              mode="idle",
-              cluster_region="{{ .Values.clusterRegion }}"
-            }[5m])
+          1 - avg by (cluster_region, instance) (
+            rate(node_cpu_seconds_total{mode="idle"}[5m])
           )
         ) * 100 > {{ .Values.rules.node.cpuCriticalThreshold }}
       for: 5m
       labels:
         severity: wip
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeNodeFilesystemAlmostFull
       annotations:
         description: >
           Node {{ "{{" }} $labels.instance {{ "}}" }} root filesystem is
-          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% full on cluster {{ .Values.clusterRegion }}.
-        summary: Node root filesystem almost full ({{ .Values.clusterRegion }})
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% full on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        summary: Node root filesystem almost full ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.node.filesystemAlmostFull | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
@@ -114,12 +104,10 @@ spec:
         (
           1 - (
             node_filesystem_avail_bytes{
-              cluster_region="{{ .Values.clusterRegion }}",
               mountpoint="/",
               fstype!~"tmpfs|fuse.lxcfs|squashfs"
             }
             / node_filesystem_size_bytes{
-              cluster_region="{{ .Values.clusterRegion }}",
               mountpoint="/",
               fstype!~"tmpfs|fuse.lxcfs|squashfs"
             }
@@ -128,15 +116,14 @@ spec:
       for: 10m
       labels:
         severity: warning
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeNodeFilesystemAlmostFull
       annotations:
         description: >
           Node {{ "{{" }} $labels.instance {{ "}}" }} root filesystem is
-          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% full on cluster {{ .Values.clusterRegion }}.
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% full on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
           Immediate action required.
-        summary: Node root filesystem critically full ({{ .Values.clusterRegion }})
+        summary: Node root filesystem critically full ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.node.filesystemAlmostFull | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
@@ -144,12 +131,10 @@ spec:
         (
           1 - (
             node_filesystem_avail_bytes{
-              cluster_region="{{ .Values.clusterRegion }}",
               mountpoint="/",
               fstype!~"tmpfs|fuse.lxcfs|squashfs"
             }
             / node_filesystem_size_bytes{
-              cluster_region="{{ .Values.clusterRegion }}",
               mountpoint="/",
               fstype!~"tmpfs|fuse.lxcfs|squashfs"
             }
@@ -158,14 +143,13 @@ spec:
       for: 10m
       labels:
         severity: wip
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeNodeInodesSaturation
       annotations:
         description: >
           Node {{ "{{" }} $labels.instance {{ "}}" }} inode usage is
-          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
-        summary: Node root filesystem inode saturation ({{ .Values.clusterRegion }})
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        summary: Node root filesystem inode saturation ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.node.inodesSaturation | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
@@ -173,12 +157,10 @@ spec:
         (
           1 - (
             node_filesystem_files_free{
-              cluster_region="{{ .Values.clusterRegion }}",
               mountpoint="/",
               fstype!~"tmpfs|fuse.lxcfs|squashfs"
             }
             / node_filesystem_files{
-              cluster_region="{{ .Values.clusterRegion }}",
               mountpoint="/",
               fstype!~"tmpfs|fuse.lxcfs|squashfs"
             }
@@ -187,15 +169,14 @@ spec:
       for: 10m
       labels:
         severity: warning
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeNodeInodesSaturation
       annotations:
         description: >
           Node {{ "{{" }} $labels.instance {{ "}}" }} inode usage is
-          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
           Immediate action required.
-        summary: Node root filesystem inodes critically saturated ({{ .Values.clusterRegion }})
+        summary: Node root filesystem inodes critically saturated ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.node.inodesSaturation | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
@@ -203,12 +184,10 @@ spec:
         (
           1 - (
             node_filesystem_files_free{
-              cluster_region="{{ .Values.clusterRegion }}",
               mountpoint="/",
               fstype!~"tmpfs|fuse.lxcfs|squashfs"
             }
             / node_filesystem_files{
-              cluster_region="{{ .Values.clusterRegion }}",
               mountpoint="/",
               fstype!~"tmpfs|fuse.lxcfs|squashfs"
             }
@@ -217,25 +196,22 @@ spec:
       for: 10m
       labels:
         severity: wip
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeNodeFilesystemSpaceFillingUp
       annotations:
         description: >
           Node {{ "{{" }} $labels.instance {{ "}}" }} root filesystem is predicted to fill up
-          within 24 hours on cluster {{ .Values.clusterRegion }}.
-        summary: Node root filesystem predicted to be full in 24h ({{ .Values.clusterRegion }})
+          within 24 hours on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        summary: Node root filesystem predicted to be full in 24h ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.node.filesystemSpaceFillingUp | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
           node_filesystem_avail_bytes{
-            cluster_region="{{ .Values.clusterRegion }}",
             mountpoint="/",
             fstype!~"tmpfs|fuse.lxcfs|squashfs"
           } / node_filesystem_size_bytes{
-            cluster_region="{{ .Values.clusterRegion }}",
             mountpoint="/",
             fstype!~"tmpfs|fuse.lxcfs|squashfs"
           } * 100 < 15
@@ -243,7 +219,6 @@ spec:
         and
         predict_linear(
           node_filesystem_avail_bytes{
-            cluster_region="{{ .Values.clusterRegion }}",
             mountpoint="/",
             fstype!~"tmpfs|fuse.lxcfs|squashfs"
           }[6h],
@@ -252,76 +227,65 @@ spec:
       for: 1h
       labels:
         severity: warning
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeNodePressure
       annotations:
         description: >
           Node {{ "{{" }} $labels.node {{ "}}" }} has {{ "{{" }} $labels.condition {{ "}}" }}
-          pressure on cluster {{ .Values.clusterRegion }}.
-        summary: Node pressure condition active ({{ .Values.clusterRegion }})
+          pressure on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        summary: Node pressure condition active ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.node.pressure | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         kube_node_status_condition{
           condition=~"MemoryPressure|DiskPressure|PIDPressure",
-          status="true",
-          cluster_region="{{ .Values.clusterRegion }}"
+          status="true"
         } == 1
       for: 10m
       labels:
         severity: warning
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeNodeLoadHigh
       annotations:
         description: >
           Node {{ "{{" }} $labels.instance {{ "}}" }} normalized load is
-          {{ "{{" }} printf "%.2f" $value {{ "}}" }}x on cluster {{ .Values.clusterRegion }}.
-        summary: Node load saturation high ({{ .Values.clusterRegion }})
+          {{ "{{" }} printf "%.2f" $value {{ "}}" }}x on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        summary: Node load saturation high ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.node.loadHigh | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
-          node_load5{cluster_region="{{ .Values.clusterRegion }}"}
-          / on(instance, cluster_region)
-          count by (instance, cluster_region) (
-            node_cpu_seconds_total{
-              mode="idle",
-              cluster_region="{{ .Values.clusterRegion }}"
-            }
+          node_load5
+          / on(cluster_region, instance)
+          count by (cluster_region, instance) (
+            node_cpu_seconds_total{mode="idle"}
           )
         ) > {{ .Values.rules.node.loadWarningRatio }}
       for: 10m
       labels:
         severity: warning
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeNodeLoadHigh
       annotations:
         description: >
           Node {{ "{{" }} $labels.instance {{ "}}" }} normalized load is
-          {{ "{{" }} printf "%.2f" $value {{ "}}" }}x on cluster {{ .Values.clusterRegion }}.
+          {{ "{{" }} printf "%.2f" $value {{ "}}" }}x on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
           Immediate action required.
-        summary: Node load critically saturated ({{ .Values.clusterRegion }})
+        summary: Node load critically saturated ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.node.loadHigh | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
-          node_load5{cluster_region="{{ .Values.clusterRegion }}"}
-          / on(instance, cluster_region)
-          count by (instance, cluster_region) (
-            node_cpu_seconds_total{
-              mode="idle",
-              cluster_region="{{ .Values.clusterRegion }}"
-            }
+          node_load5
+          / on(cluster_region, instance)
+          count by (cluster_region, instance) (
+            node_cpu_seconds_total{mode="idle"}
           )
         ) > {{ .Values.rules.node.loadCriticalRatio }}
       for: 10m
       labels:
         severity: wip
-        cluster_region: {{ .Values.clusterRegion }}
 {{- end }}

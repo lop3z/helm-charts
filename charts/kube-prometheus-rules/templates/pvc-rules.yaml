@@ -15,174 +15,165 @@ spec:
       annotations:
         description: >
           PVC {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.persistentvolumeclaim {{ "}}" }}
-          is {{ "{{" }} printf "%.0f" $value {{ "}}" }}% full on cluster {{ .Values.clusterRegion }}.
-        summary: PVC is almost full ({{ .Values.clusterRegion }})
+          is {{ "{{" }} printf "%.0f" $value {{ "}}" }}% full on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        summary: PVC is almost full ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.pvc.fillingUp | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
-          kubelet_volume_stats_used_bytes{cluster_region="{{ .Values.clusterRegion }}"}
-          / kubelet_volume_stats_capacity_bytes{cluster_region="{{ .Values.clusterRegion }}"}
+          kubelet_volume_stats_used_bytes
+          / kubelet_volume_stats_capacity_bytes
           * 100
         ) > {{ .Values.rules.pvc.warningThreshold }}
       for: 10m
       labels:
         severity: warning
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubePersistentVolumeFillingUp
       annotations:
         description: >
           PVC {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.persistentvolumeclaim {{ "}}" }}
-          is {{ "{{" }} printf "%.0f" $value {{ "}}" }}% full on cluster {{ .Values.clusterRegion }}.
+          is {{ "{{" }} printf "%.0f" $value {{ "}}" }}% full on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
           Immediate action required.
-        summary: PVC is critically full ({{ .Values.clusterRegion }})
+        summary: PVC is critically full ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.pvc.fillingUp | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
-          kubelet_volume_stats_used_bytes{cluster_region="{{ .Values.clusterRegion }}"}
-          / kubelet_volume_stats_capacity_bytes{cluster_region="{{ .Values.clusterRegion }}"}
+          kubelet_volume_stats_used_bytes
+          / kubelet_volume_stats_capacity_bytes
           * 100
         ) > {{ .Values.rules.pvc.criticalThreshold }}
       for: 10m
       labels:
         severity: wip
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubePersistentVolumeInodesFillingUp
       annotations:
         description: >
           PVC {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.persistentvolumeclaim {{ "}}" }}
-          inode usage is {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
-        summary: PVC inodes almost exhausted ({{ .Values.clusterRegion }})
+          inode usage is {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        summary: PVC inodes almost exhausted ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.pvc.inodesFillingUp | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
-          kubelet_volume_stats_inodes_used{cluster_region="{{ .Values.clusterRegion }}"}
-          / kubelet_volume_stats_inodes{cluster_region="{{ .Values.clusterRegion }}"}
+          kubelet_volume_stats_inodes_used
+          / kubelet_volume_stats_inodes
           * 100
         ) > {{ .Values.rules.pvc.inodeWarningThreshold }}
         unless (
-          kubelet_volume_stats_inodes{cluster_region="{{ .Values.clusterRegion }}"} == 0
+          kubelet_volume_stats_inodes == 0
         )
       for: 10m
       labels:
         severity: warning
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubePersistentVolumeInodesFillingUp
       annotations:
         description: >
           PVC {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.persistentvolumeclaim {{ "}}" }}
-          inode usage is {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ .Values.clusterRegion }}.
+          inode usage is {{ "{{" }} printf "%.0f" $value {{ "}}" }}% on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
           Immediate action required.
-        summary: PVC inodes critically exhausted ({{ .Values.clusterRegion }})
+        summary: PVC inodes critically exhausted ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.pvc.inodesFillingUp | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
-          kubelet_volume_stats_inodes_used{cluster_region="{{ .Values.clusterRegion }}"}
-          / kubelet_volume_stats_inodes{cluster_region="{{ .Values.clusterRegion }}"}
+          kubelet_volume_stats_inodes_used
+          / kubelet_volume_stats_inodes
           * 100
         ) > {{ .Values.rules.pvc.inodeCriticalThreshold }}
         unless (
-          kubelet_volume_stats_inodes{cluster_region="{{ .Values.clusterRegion }}"} == 0
+          kubelet_volume_stats_inodes == 0
         )
       for: 10m
       labels:
         severity: wip
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubePersistentVolumeFillingUpPredicted
       annotations:
         description: >
           PVC {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.persistentvolumeclaim {{ "}}" }}
-          is predicted to fill up within {{ .Values.rules.pvc.predictFullInHours }} hours on cluster {{ .Values.clusterRegion }}.
-        summary: PVC predicted to be full in {{ .Values.rules.pvc.predictFullInHours }}h ({{ .Values.clusterRegion }})
+          is predicted to fill up within {{ .Values.rules.pvc.predictFullInHours }} hours on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        summary: PVC predicted to be full in {{ .Values.rules.pvc.predictFullInHours }}h ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.pvc.fillingUpPredicted | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
-          kubelet_volume_stats_available_bytes{cluster_region="{{ .Values.clusterRegion }}"}
-          / kubelet_volume_stats_capacity_bytes{cluster_region="{{ .Values.clusterRegion }}"}
+          kubelet_volume_stats_available_bytes
+          / kubelet_volume_stats_capacity_bytes
           * 100 < 15
         )
         and
         predict_linear(
-          kubelet_volume_stats_available_bytes{cluster_region="{{ .Values.clusterRegion }}"}[6h],
+          kubelet_volume_stats_available_bytes[6h],
           {{ mul .Values.rules.pvc.predictFullInHours 3600 }}
         ) < 0
       for: 1h
       labels:
         severity: warning
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubePersistentVolumeErrors
       annotations:
         description: >
           PVC {{ "{{" }} $labels.persistentvolumeclaim {{ "}}" }} is in {{ "{{" }} $labels.phase {{ "}}" }}
-          phase on cluster {{ .Values.clusterRegion }}.
-        summary: PVC in Failed or Pending state ({{ .Values.clusterRegion }})
+          phase on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        summary: PVC in Failed or Pending state ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.pvc.errors | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         kube_persistentvolume_status_phase{
-          phase=~"Failed|Pending",
-          cluster_region="{{ .Values.clusterRegion }}"
+          phase=~"Failed|Pending"
         } > 0
       for: 5m
       labels:
         severity: wip
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubePersistentVolumeGrowthAbnormal
       annotations:
         description: >
           PVC {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.persistentvolumeclaim {{ "}}" }}
-          is growing at {{ "{{" }} printf "%.0f" $value {{ "}}" }}% per day on cluster {{ .Values.clusterRegion }}.
-        summary: PVC daily growth rate abnormal ({{ .Values.clusterRegion }})
+          is growing at {{ "{{" }} printf "%.0f" $value {{ "}}" }}% per day on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        summary: PVC daily growth rate abnormal ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.pvc.growthAbnormal | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
-          deriv(kubelet_volume_stats_used_bytes{cluster_region="{{ .Values.clusterRegion }}"}[1d])
+          deriv(kubelet_volume_stats_used_bytes[1d])
           * 86400
-          / kubelet_volume_stats_capacity_bytes{cluster_region="{{ .Values.clusterRegion }}"}
+          / kubelet_volume_stats_capacity_bytes
           * 100
         ) > {{ .Values.rules.pvc.growthRateWarning }}
       for: 1h
       labels:
         severity: warning
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubePersistentVolumeGrowthAbnormal
       annotations:
         description: >
           PVC {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.persistentvolumeclaim {{ "}}" }}
-          is growing at {{ "{{" }} printf "%.0f" $value {{ "}}" }}% per day on cluster {{ .Values.clusterRegion }}.
+          is growing at {{ "{{" }} printf "%.0f" $value {{ "}}" }}% per day on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
           Immediate action required.
-        summary: PVC daily growth rate critically high ({{ .Values.clusterRegion }})
+        summary: PVC daily growth rate critically high ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.pvc.growthAbnormal | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
-          deriv(kubelet_volume_stats_used_bytes{cluster_region="{{ .Values.clusterRegion }}"}[1d])
+          deriv(kubelet_volume_stats_used_bytes[1d])
           * 86400
-          / kubelet_volume_stats_capacity_bytes{cluster_region="{{ .Values.clusterRegion }}"}
+          / kubelet_volume_stats_capacity_bytes
           * 100
         ) > {{ .Values.rules.pvc.growthRateCritical }}
       for: 1h
       labels:
         severity: wip
-        cluster_region: {{ .Values.clusterRegion }}
 {{- end }}

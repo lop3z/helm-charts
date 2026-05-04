@@ -16,46 +16,42 @@ spec:
         description: >
           Pod {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.pod {{ "}}" }}
           container {{ "{{" }} $labels.container {{ "}}" }} restarted
-          {{ "{{" }} printf "%.0f" $value {{ "}}" }} times in the last 15m on cluster {{ .Values.clusterRegion }}.
-        summary: Pod restart spike detected ({{ .Values.clusterRegion }})
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }} times in the last 15m on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        summary: Pod restart spike detected ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.workload.podRestartSpike | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
-        increase(kube_pod_container_status_restarts_total{
-          cluster_region="{{ .Values.clusterRegion }}"
-        }[15m]) > {{ .Values.rules.workload.podRestartWarningThreshold }}
+        increase(kube_pod_container_status_restarts_total[15m])
+          > {{ .Values.rules.workload.podRestartWarningThreshold }}
       for: 0m
       labels:
         severity: warning
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubePodRestartSpike
       annotations:
         description: >
           Pod {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.pod {{ "}}" }}
           container {{ "{{" }} $labels.container {{ "}}" }} restarted
-          {{ "{{" }} printf "%.0f" $value {{ "}}" }} times in the last 15m on cluster {{ .Values.clusterRegion }}.
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }} times in the last 15m on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
           Immediate action required.
-        summary: Pod restart spike critical ({{ .Values.clusterRegion }})
+        summary: Pod restart spike critical ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.workload.podRestartSpike | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
-        increase(kube_pod_container_status_restarts_total{
-          cluster_region="{{ .Values.clusterRegion }}"
-        }[15m]) > {{ .Values.rules.workload.podRestartCriticalThreshold }}
+        increase(kube_pod_container_status_restarts_total[15m])
+          > {{ .Values.rules.workload.podRestartCriticalThreshold }}
       for: 0m
       labels:
         severity: wip
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubePodNotReadyRatioHigh
       annotations:
         description: >
           {{ "{{" }} printf "%.0f" $value {{ "}}" }}% of pods in namespace
-          {{ "{{" }} $labels.namespace {{ "}}" }} are not ready on cluster {{ .Values.clusterRegion }}.
-        summary: High pod not-ready ratio ({{ .Values.clusterRegion }})
+          {{ "{{" }} $labels.namespace {{ "}}" }} are not ready on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        summary: High pod not-ready ratio ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.workload.podNotReady | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
@@ -63,144 +59,122 @@ spec:
       # pods (e.g. completed Job pods in jx-git-operator that linger as Ready=false).
       expr: |-
         (
-          count by (namespace, cluster_region) (
-            (kube_pod_status_phase{phase="Running",cluster_region="{{ .Values.clusterRegion }}"} == 1)
-            unless on (namespace, pod, cluster_region)
-            (kube_pod_status_ready{condition="true",cluster_region="{{ .Values.clusterRegion }}"} == 1)
+          count by (cluster_region, namespace) (
+            (kube_pod_status_phase{phase="Running"} == 1)
+            unless on (cluster_region, namespace, pod)
+            (kube_pod_status_ready{condition="true"} == 1)
           )
           /
-          count by (namespace, cluster_region) (
-            kube_pod_status_phase{phase="Running",cluster_region="{{ .Values.clusterRegion }}"} == 1
+          count by (cluster_region, namespace) (
+            kube_pod_status_phase{phase="Running"} == 1
           )
         ) * 100 > {{ .Values.rules.workload.podNotReadyWarningThreshold }}
       for: 10m
       labels:
         severity: warning
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubePodNotReadyRatioHigh
       annotations:
         description: >
           {{ "{{" }} printf "%.0f" $value {{ "}}" }}% of pods in namespace
-          {{ "{{" }} $labels.namespace {{ "}}" }} are not ready on cluster {{ .Values.clusterRegion }}.
+          {{ "{{" }} $labels.namespace {{ "}}" }} are not ready on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
           Immediate action required.
-        summary: Critical pod not-ready ratio ({{ .Values.clusterRegion }})
+        summary: Critical pod not-ready ratio ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.workload.podNotReady | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
-          count by (namespace, cluster_region) (
-            (kube_pod_status_phase{phase="Running",cluster_region="{{ .Values.clusterRegion }}"} == 1)
-            unless on (namespace, pod, cluster_region)
-            (kube_pod_status_ready{condition="true",cluster_region="{{ .Values.clusterRegion }}"} == 1)
+          count by (cluster_region, namespace) (
+            (kube_pod_status_phase{phase="Running"} == 1)
+            unless on (cluster_region, namespace, pod)
+            (kube_pod_status_ready{condition="true"} == 1)
           )
           /
-          count by (namespace, cluster_region) (
-            kube_pod_status_phase{phase="Running",cluster_region="{{ .Values.clusterRegion }}"} == 1
+          count by (cluster_region, namespace) (
+            kube_pod_status_phase{phase="Running"} == 1
           )
         ) * 100 > {{ .Values.rules.workload.podNotReadyCriticalThreshold }}
       for: 10m
       labels:
         severity: wip
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeWorkloadUnavailableRatioHigh
       annotations:
         description: >
           Deployment {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.deployment {{ "}}" }}
-          has {{ "{{" }} printf "%.0f" $value {{ "}}" }}% replicas unavailable on cluster {{ .Values.clusterRegion }}.
-        summary: Workload unavailable replica ratio high ({{ .Values.clusterRegion }})
+          has {{ "{{" }} printf "%.0f" $value {{ "}}" }}% replicas unavailable on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        summary: Workload unavailable replica ratio high ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.workload.workloadUnavailable | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
-          kube_deployment_status_replicas_unavailable{
-            cluster_region="{{ .Values.clusterRegion }}"
-          }
+          kube_deployment_status_replicas_unavailable
           /
-          kube_deployment_status_replicas{
-            cluster_region="{{ .Values.clusterRegion }}"
-          }
+          kube_deployment_status_replicas
         ) * 100 > {{ .Values.rules.workload.workloadUnavailableWarningThreshold }}
       for: 10m
       labels:
         severity: warning
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeWorkloadUnavailableRatioHigh
       annotations:
         description: >
           Deployment {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.deployment {{ "}}" }}
-          has {{ "{{" }} printf "%.0f" $value {{ "}}" }}% replicas unavailable on cluster {{ .Values.clusterRegion }}.
+          has {{ "{{" }} printf "%.0f" $value {{ "}}" }}% replicas unavailable on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
           Immediate action required.
-        summary: Workload unavailable replica ratio critical ({{ .Values.clusterRegion }})
+        summary: Workload unavailable replica ratio critical ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.workload.workloadUnavailable | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
-          kube_deployment_status_replicas_unavailable{
-            cluster_region="{{ .Values.clusterRegion }}"
-          }
+          kube_deployment_status_replicas_unavailable
           /
-          kube_deployment_status_replicas{
-            cluster_region="{{ .Values.clusterRegion }}"
-          }
+          kube_deployment_status_replicas
         ) * 100 > {{ .Values.rules.workload.workloadUnavailableCriticalThreshold }}
       for: 10m
       labels:
         severity: wip
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeHPAMaxedReplicas
       annotations:
         description: >
           HPA {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.horizontalpodautoscaler {{ "}}" }}
-          is at {{ "{{" }} printf "%.0f" $value {{ "}}" }}% of max replicas on cluster {{ .Values.clusterRegion }}.
-        summary: HPA near maximum replicas ({{ .Values.clusterRegion }})
+          is at {{ "{{" }} printf "%.0f" $value {{ "}}" }}% of max replicas on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        summary: HPA near maximum replicas ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.workload.hpaMaxedReplicas | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
-          kube_horizontalpodautoscaler_status_current_replicas{
-            cluster_region="{{ .Values.clusterRegion }}"
-          }
+          kube_horizontalpodautoscaler_status_current_replicas
           /
-          kube_horizontalpodautoscaler_spec_max_replicas{
-            cluster_region="{{ .Values.clusterRegion }}"
-          }
+          kube_horizontalpodautoscaler_spec_max_replicas
         ) * 100 >= {{ .Values.rules.workload.hpaMaxedWarningRatio }}
       for: 10m
       labels:
         severity: warning
-        cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeHPAMaxedReplicas
       annotations:
         description: >
           HPA {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.horizontalpodautoscaler {{ "}}" }}
-          has reached maximum replicas on cluster {{ .Values.clusterRegion }}.
+          has reached maximum replicas on cluster {{ "{{" }} $labels.cluster_region {{ "}}" }}.
           Immediate action required.
-        summary: HPA at maximum replicas ({{ .Values.clusterRegion }})
+        summary: HPA at maximum replicas ({{ "{{" }} $labels.cluster_region {{ "}}" }})
         {{- with (.Values.runbooks.workload.hpaMaxedReplicas | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
         {{- end }}
       expr: |-
         (
-          kube_horizontalpodautoscaler_status_current_replicas{
-            cluster_region="{{ .Values.clusterRegion }}"
-          }
+          kube_horizontalpodautoscaler_status_current_replicas
           /
-          kube_horizontalpodautoscaler_spec_max_replicas{
-            cluster_region="{{ .Values.clusterRegion }}"
-          }
+          kube_horizontalpodautoscaler_spec_max_replicas
         ) * 100 >= {{ .Values.rules.workload.hpaMaxedCriticalRatio }}
       for: 10m
       labels:
         severity: wip
-        cluster_region: {{ .Values.clusterRegion }}
 
 {{- end }}
