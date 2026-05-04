@@ -101,7 +101,7 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 6,
+        "w": 5,
         "x": 0,
         "y": 1
       },
@@ -186,8 +186,8 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 6,
-        "x": 6,
+        "w": 5,
+        "x": 5,
         "y": 1
       },
       "id": 8002,
@@ -271,8 +271,8 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 6,
-        "x": 12,
+        "w": 5,
+        "x": 10,
         "y": 1
       },
       "id": 8003,
@@ -356,8 +356,8 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 6,
-        "x": 18,
+        "w": 5,
+        "x": 15,
         "y": 1
       },
       "id": 8004,
@@ -395,6 +395,91 @@
         }
       ],
       "title": "Max Net Node",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Node with highest normalized 5m load (load5 / cpu cores)",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
+          "decimals": 2,
+          "links": [
+            {
+              "targetBlank": false,
+              "title": "Drill down to node",
+              "url": "d/${__dashboard.uid}/${__dashboard.slug}?var-datasource=${datasource}&var-job=${job}&var-cluster_region=${__field.labels.cluster_region}&var-node=${__field.labels.nodename}"
+            }
+          ],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "dark-yellow",
+                "value": 1.2
+              },
+              {
+                "color": "dark-red",
+                "value": 1.5
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 4,
+        "x": 20,
+        "y": 1
+      },
+      "id": 8005,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "topk(1,\n  node_load5{job=\"$job\", cluster_region=~\"$cluster_region\", instance=~\"$node_instance\"}\n  / on(instance) group_left() count by(instance) (\n    node_cpu_seconds_total{job=\"$job\", cluster_region=~\"$cluster_region\", instance=~\"$node_instance\", mode=\"idle\"}\n  )\n  * on(instance) group_left(nodename, cluster_region) node_uname_info{job=\"$job\", cluster_region=~\"$cluster_region\", nodename=~\"$node\"}\n)",
+          "instant": true,
+          "legendFormat": "{{nodename}} ({{cluster_region}})",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Max Load Node",
       "type": "stat"
     },
     {
@@ -932,7 +1017,7 @@
       },
       "id": 9010,
       "panels": [],
-      "title": "Node Rankings — Worst First",
+      "title": "Node Rankings \u2014 Worst First",
       "type": "row"
     },
     {
@@ -940,7 +1025,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Root filesystem usage per node — red means nearly full",
+      "description": "Root filesystem usage per node \u2014 red means nearly full",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1034,7 +1119,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "All nodes ranked by CPU usage — worst at top",
+      "description": "All nodes ranked by CPU usage \u2014 worst at top",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1128,7 +1213,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "All nodes ranked by RAM usage — worst at top",
+      "description": "All nodes ranked by RAM usage \u2014 worst at top",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -25529,6 +25614,6 @@
   "timezone": "browser",
   "title": "Node Exporter Full Sorted",
   "uid": "rYdddlPWk3",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }
