@@ -41,7 +41,7 @@ spec:
         up{cluster_region="{{ .Values.clusterRegion }}"} == 0
       for: 5m
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeScrapeErrorRatioHigh
@@ -82,7 +82,7 @@ spec:
         ) * 100 > {{ .Values.rules.targets.scrapeErrorRatioCritical }}
       for: 5m
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeHAProxyBackendDown
@@ -121,7 +121,7 @@ spec:
         } == 1
       for: 5m
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeMongoDBExporterDown
@@ -154,6 +154,6 @@ spec:
         mongodb_up{cluster_region="{{ .Values.clusterRegion }}"} == 0
       for: 5m
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 {{- end }}

@@ -52,6 +52,6 @@ spec:
         ) / 3600 > {{ .Values.rules.velero.staleCriticalHours }}
       for: 0m
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 {{- end }}

@@ -55,7 +55,7 @@ spec:
         ) > {{ .Values.rules.kubeApi.latencyCriticalSeconds }}
       for: 5m
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeAPIErrorRatioHigh
@@ -96,7 +96,7 @@ spec:
         ) * 100 > {{ .Values.rules.kubeApi.errorRatioCritical }}
       for: 5m
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeJobFailed
@@ -137,7 +137,7 @@ spec:
         ) >= {{ .Values.rules.kubeApi.jobFailedCritical }}
       for: 0m
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 
     # Lateness = time() - next_schedule_time. Negative when on schedule (next run still in future),
@@ -178,6 +178,6 @@ spec:
         } > {{ .Values.rules.kubeApi.cronJobLateCriticalSeconds }}
       for: 0m
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 {{- end }}

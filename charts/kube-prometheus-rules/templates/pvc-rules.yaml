@@ -49,7 +49,7 @@ spec:
         ) > {{ .Values.rules.pvc.criticalThreshold }}
       for: 10m
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubePersistentVolumeInodesFillingUp
@@ -96,7 +96,7 @@ spec:
         )
       for: 10m
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubePersistentVolumeFillingUpPredicted
@@ -140,7 +140,7 @@ spec:
         } > 0
       for: 5m
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubePersistentVolumeGrowthAbnormal
@@ -183,6 +183,6 @@ spec:
         ) > {{ .Values.rules.pvc.growthRateCritical }}
       for: 1h
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 {{- end }}

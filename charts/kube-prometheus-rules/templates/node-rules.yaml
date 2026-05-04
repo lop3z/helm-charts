@@ -51,7 +51,7 @@ spec:
         ) * 100 > {{ .Values.rules.node.memoryCriticalThreshold }}
       for: 5m
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeNodeCPUSaturation
@@ -98,7 +98,7 @@ spec:
         ) * 100 > {{ .Values.rules.node.cpuCriticalThreshold }}
       for: 5m
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeNodeFilesystemAlmostFull
@@ -157,7 +157,7 @@ spec:
         ) * 100 > {{ .Values.rules.node.diskCriticalThreshold }}
       for: 10m
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeNodeInodesSaturation
@@ -216,7 +216,7 @@ spec:
         ) * 100 > {{ .Values.rules.node.inodeCriticalThreshold }}
       for: 10m
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeNodeFilesystemSpaceFillingUp
@@ -322,6 +322,6 @@ spec:
         ) > {{ .Values.rules.node.loadCriticalRatio }}
       for: 10m
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 {{- end }}

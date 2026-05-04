@@ -47,7 +47,7 @@ spec:
         }[15m]) > {{ .Values.rules.workload.podRestartCriticalThreshold }}
       for: 0m
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubePodNotReadyRatioHigh
@@ -102,7 +102,7 @@ spec:
         ) * 100 > {{ .Values.rules.workload.podNotReadyCriticalThreshold }}
       for: 10m
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeWorkloadUnavailableRatioHigh
@@ -151,7 +151,7 @@ spec:
         ) * 100 > {{ .Values.rules.workload.workloadUnavailableCriticalThreshold }}
       for: 10m
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 
     - alert: KubeHPAMaxedReplicas
@@ -200,7 +200,7 @@ spec:
         ) * 100 >= {{ .Values.rules.workload.hpaMaxedCriticalRatio }}
       for: 10m
       labels:
-        severity: critical
+        severity: wip
         cluster_region: {{ .Values.clusterRegion }}
 
 {{- end }}
