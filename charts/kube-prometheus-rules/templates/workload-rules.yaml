@@ -1,4 +1,6 @@
 {{- if .Values.rules.workload.enabled }}
+{{- $sevWarn := ternary "wip_warning" "warning" .Values.rules.workload.warningSuppressed }}
+{{- $sevCrit := ternary "wip_critical" "critical" .Values.rules.workload.criticalSuppressed }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -26,7 +28,7 @@ spec:
           > {{ .Values.rules.workload.podRestartWarningThreshold }}
       for: 0m
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubePodRestartSpike
       annotations:
@@ -44,7 +46,7 @@ spec:
           > {{ .Values.rules.workload.podRestartCriticalThreshold }}
       for: 0m
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 
     - alert: KubePodNotReadyRatioHigh
       annotations:
@@ -71,7 +73,7 @@ spec:
         ) * 100 > {{ .Values.rules.workload.podNotReadyWarningThreshold }}
       for: 10m
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubePodNotReadyRatioHigh
       annotations:
@@ -97,7 +99,7 @@ spec:
         ) * 100 > {{ .Values.rules.workload.podNotReadyCriticalThreshold }}
       for: 10m
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 
     - alert: KubeWorkloadUnavailableRatioHigh
       annotations:
@@ -116,7 +118,7 @@ spec:
         ) * 100 > {{ .Values.rules.workload.workloadUnavailableWarningThreshold }}
       for: 10m
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubeWorkloadUnavailableRatioHigh
       annotations:
@@ -136,7 +138,7 @@ spec:
         ) * 100 > {{ .Values.rules.workload.workloadUnavailableCriticalThreshold }}
       for: 10m
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 
     - alert: KubeHPAMaxedReplicas
       annotations:
@@ -155,7 +157,7 @@ spec:
         ) * 100 >= {{ .Values.rules.workload.hpaMaxedWarningRatio }}
       for: 10m
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubeHPAMaxedReplicas
       annotations:
@@ -175,6 +177,6 @@ spec:
         ) * 100 >= {{ .Values.rules.workload.hpaMaxedCriticalRatio }}
       for: 10m
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 
 {{- end }}

@@ -1,4 +1,6 @@
 {{- if .Values.rules.kubeApi.enabled }}
+{{- $sevWarn := ternary "wip_warning" "warning" .Values.rules.kubeApi.warningSuppressed }}
+{{- $sevCrit := ternary "wip_critical" "critical" .Values.rules.kubeApi.criticalSuppressed }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -31,7 +33,7 @@ spec:
         ) > {{ .Values.rules.kubeApi.latencyWarningSeconds }}
       for: 5m
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubeAPILatencyHigh
       annotations:
@@ -54,7 +56,7 @@ spec:
         ) > {{ .Values.rules.kubeApi.latencyCriticalSeconds }}
       for: 5m
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 
     - alert: KubeAPIErrorRatioHigh
       annotations:
@@ -73,7 +75,7 @@ spec:
         ) * 100 > {{ .Values.rules.kubeApi.errorRatioWarning }}
       for: 5m
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubeAPIErrorRatioHigh
       annotations:
@@ -93,7 +95,7 @@ spec:
         ) * 100 > {{ .Values.rules.kubeApi.errorRatioCritical }}
       for: 5m
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 
     - alert: KubeJobFailed
       annotations:
@@ -110,7 +112,7 @@ spec:
         ) >= {{ .Values.rules.kubeApi.jobFailedWarning }}
       for: 0m
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubeJobFailed
       annotations:
@@ -128,7 +130,7 @@ spec:
         ) >= {{ .Values.rules.kubeApi.jobFailedCritical }}
       for: 0m
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 
     # Lateness = time() - next_schedule_time. Negative when on schedule (next run still in future),
     # positive when overdue. Period-agnostic — works for hourly, daily, monthly cronjobs.
@@ -147,7 +149,7 @@ spec:
           > {{ .Values.rules.kubeApi.cronJobLateWarningSeconds }}
       for: 0m
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubeCronJobMissedSchedule
       annotations:
@@ -165,5 +167,5 @@ spec:
           > {{ .Values.rules.kubeApi.cronJobLateCriticalSeconds }}
       for: 0m
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 {{- end }}

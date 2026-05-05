@@ -14,9 +14,22 @@ dashboard:
   # Grafana folder name (matched via grafana_folder annotation)
   folder: Kubernetes
 
+# Per-family rule configuration.
+#
+# Each family has two suppression flags:
+#   warningSuppressed:  true → severity label becomes "wip_warning"  (silent)
+#                       false → "warning"  (telegram + slack via alertmanager)
+#   criticalSuppressed: true → severity label becomes "wip_critical" (silent)
+#                       false → "critical" (telegram + slack + pagerduty)
+#
+# Defaults are `true` for both — every alert ships in draft mode and notifies nothing.
+# Override per-family in the version stream / cluster repo to opt-in to notifications
+# once you've validated the alert behaviour for your environment.
 rules:
   pvc:
     enabled: true
+    warningSuppressed: true
+    criticalSuppressed: true
     # Warning: PVC capacity usage > warningThreshold %
     warningThreshold: 75
     # Critical: PVC capacity usage > criticalThreshold %
@@ -33,6 +46,8 @@ rules:
 
   node:
     enabled: true
+    warningSuppressed: true
+    criticalSuppressed: true
     # Memory usage thresholds (%)
     memoryWarningThreshold: 85
     memoryCriticalThreshold: 95
@@ -45,12 +60,16 @@ rules:
     # Root filesystem inode usage thresholds (%)
     inodeWarningThreshold: 85
     inodeCriticalThreshold: 95
-    # Normalized load (load5 / cpu_count) thresholds
+    # Normalized load (load15 / cpu_count) thresholds.
+    # Using the 15-minute average smooths out short spikes that don't reflect
+    # sustained pressure on the node.
     loadWarningRatio: 1.20
     loadCriticalRatio: 1.50
 
   workload:
     enabled: true
+    warningSuppressed: true
+    criticalSuppressed: true
     # Pod restart spike thresholds (count in 15m)
     podRestartWarningThreshold: 5
     podRestartCriticalThreshold: 10
@@ -66,6 +85,8 @@ rules:
 
   kubeApi:
     enabled: true
+    warningSuppressed: true
+    criticalSuppressed: true
     # API server p99 latency thresholds (seconds)
     latencyWarningSeconds: 1.0
     latencyCriticalSeconds: 2.0
@@ -83,12 +104,16 @@ rules:
 
   targets:
     enabled: true
+    warningSuppressed: true
+    criticalSuppressed: true
     # Scrape error ratio thresholds (% of targets down)
     scrapeErrorRatioWarning: 5
     scrapeErrorRatioCritical: 20
 
   velero:
     enabled: true
+    warningSuppressed: true
+    criticalSuppressed: true
     # Hours since last successful backup before warning (default: 25h — 1h grace after daily schedule)
     staleWarningHours: 25
     # Hours since last successful backup before critical (default: 49h — missed 2 consecutive runs)

@@ -1,4 +1,6 @@
 {{- if .Values.rules.targets.enabled }}
+{{- $sevWarn := ternary "wip_warning" "warning" .Values.rules.targets.warningSuppressed }}
+{{- $sevCrit := ternary "wip_critical" "critical" .Values.rules.targets.criticalSuppressed }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -24,7 +26,7 @@ spec:
         up == 0
       for: 2m
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubeScrapeTargetDown
       annotations:
@@ -40,7 +42,7 @@ spec:
         up == 0
       for: 5m
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 
     - alert: KubeScrapeErrorRatioHigh
       annotations:
@@ -59,7 +61,7 @@ spec:
         ) * 100 > {{ .Values.rules.targets.scrapeErrorRatioWarning }}
       for: 5m
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubeScrapeErrorRatioHigh
       annotations:
@@ -79,7 +81,7 @@ spec:
         ) * 100 > {{ .Values.rules.targets.scrapeErrorRatioCritical }}
       for: 5m
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 
     - alert: KubeHAProxyBackendDown
       annotations:
@@ -94,7 +96,7 @@ spec:
         haproxy_backend_status{status="DOWN"} == 1
       for: 2m
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubeHAProxyBackendDown
       annotations:
@@ -110,7 +112,7 @@ spec:
         haproxy_backend_status{status="DOWN"} == 1
       for: 5m
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 
     - alert: KubeMongoDBExporterDown
       annotations:
@@ -125,7 +127,7 @@ spec:
         mongodb_up == 0
       for: 2m
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubeMongoDBExporterDown
       annotations:
@@ -141,5 +143,5 @@ spec:
         mongodb_up == 0
       for: 5m
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 {{- end }}

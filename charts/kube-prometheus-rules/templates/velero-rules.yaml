@@ -1,4 +1,6 @@
 {{- if .Values.rules.velero.enabled }}
+{{- $sevWarn := ternary "wip_warning" "warning" .Values.rules.velero.warningSuppressed }}
+{{- $sevCrit := ternary "wip_critical" "critical" .Values.rules.velero.criticalSuppressed }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -27,7 +29,7 @@ spec:
         ) / 3600 > {{ .Values.rules.velero.staleWarningHours }}
       for: 0m
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: VeleroBackupStale
       annotations:
@@ -45,5 +47,5 @@ spec:
         ) / 3600 > {{ .Values.rules.velero.staleCriticalHours }}
       for: 0m
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 {{- end }}

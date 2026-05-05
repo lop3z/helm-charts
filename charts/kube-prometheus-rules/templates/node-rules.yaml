@@ -1,4 +1,6 @@
 {{- if .Values.rules.node.enabled }}
+{{- $sevWarn := ternary "wip_warning" "warning" .Values.rules.node.warningSuppressed }}
+{{- $sevCrit := ternary "wip_critical" "critical" .Values.rules.node.criticalSuppressed }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -29,7 +31,7 @@ spec:
         ) * 100 > {{ .Values.rules.node.memoryWarningThreshold }}
       for: 5m
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubeNodeMemoryHigh
       annotations:
@@ -50,7 +52,7 @@ spec:
         ) * 100 > {{ .Values.rules.node.memoryCriticalThreshold }}
       for: 5m
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 
     - alert: KubeNodeCPUSaturation
       annotations:
@@ -69,7 +71,7 @@ spec:
         ) * 100 > {{ .Values.rules.node.cpuWarningThreshold }}
       for: 5m
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubeNodeCPUSaturation
       annotations:
@@ -89,7 +91,7 @@ spec:
         ) * 100 > {{ .Values.rules.node.cpuCriticalThreshold }}
       for: 5m
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 
     - alert: KubeNodeFilesystemAlmostFull
       annotations:
@@ -115,7 +117,7 @@ spec:
         ) * 100 > {{ .Values.rules.node.diskWarningThreshold }}
       for: 10m
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubeNodeFilesystemAlmostFull
       annotations:
@@ -142,7 +144,7 @@ spec:
         ) * 100 > {{ .Values.rules.node.diskCriticalThreshold }}
       for: 10m
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 
     - alert: KubeNodeInodesSaturation
       annotations:
@@ -168,7 +170,7 @@ spec:
         ) * 100 > {{ .Values.rules.node.inodeWarningThreshold }}
       for: 10m
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubeNodeInodesSaturation
       annotations:
@@ -195,7 +197,7 @@ spec:
         ) * 100 > {{ .Values.rules.node.inodeCriticalThreshold }}
       for: 10m
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 
     - alert: KubeNodeFilesystemSpaceFillingUp
       annotations:
@@ -226,7 +228,7 @@ spec:
         ) < 0
       for: 1h
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubeNodePressure
       annotations:
@@ -244,7 +246,7 @@ spec:
         } == 1
       for: 10m
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubeNodeLoadHigh
       annotations:
@@ -257,7 +259,7 @@ spec:
         {{- end }}
       expr: |-
         (
-          node_load5
+          node_load15
           / on(cluster_region, instance)
           count by (cluster_region, instance) (
             node_cpu_seconds_total{mode="idle"}
@@ -265,7 +267,7 @@ spec:
         ) > {{ .Values.rules.node.loadWarningRatio }}
       for: 10m
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubeNodeLoadHigh
       annotations:
@@ -279,7 +281,7 @@ spec:
         {{- end }}
       expr: |-
         (
-          node_load5
+          node_load15
           / on(cluster_region, instance)
           count by (cluster_region, instance) (
             node_cpu_seconds_total{mode="idle"}
@@ -287,5 +289,5 @@ spec:
         ) > {{ .Values.rules.node.loadCriticalRatio }}
       for: 10m
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 {{- end }}

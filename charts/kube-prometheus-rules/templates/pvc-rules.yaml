@@ -1,4 +1,6 @@
 {{- if .Values.rules.pvc.enabled }}
+{{- $sevWarn := ternary "wip_warning" "warning" .Values.rules.pvc.warningSuppressed }}
+{{- $sevCrit := ternary "wip_critical" "critical" .Values.rules.pvc.criticalSuppressed }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -28,7 +30,7 @@ spec:
         ) > {{ .Values.rules.pvc.warningThreshold }}
       for: 10m
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubePersistentVolumeFillingUp
       annotations:
@@ -48,7 +50,7 @@ spec:
         ) > {{ .Values.rules.pvc.criticalThreshold }}
       for: 10m
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 
     - alert: KubePersistentVolumeInodesFillingUp
       annotations:
@@ -70,7 +72,7 @@ spec:
         )
       for: 10m
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubePersistentVolumeInodesFillingUp
       annotations:
@@ -93,7 +95,7 @@ spec:
         )
       for: 10m
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 
     - alert: KubePersistentVolumeFillingUpPredicted
       annotations:
@@ -117,7 +119,7 @@ spec:
         ) < 0
       for: 1h
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubePersistentVolumeErrors
       annotations:
@@ -134,7 +136,7 @@ spec:
         } > 0
       for: 5m
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 
     - alert: KubePersistentVolumeGrowthAbnormal
       annotations:
@@ -154,7 +156,7 @@ spec:
         ) > {{ .Values.rules.pvc.growthRateWarning }}
       for: 1h
       labels:
-        severity: warning
+        severity: {{ $sevWarn }}
 
     - alert: KubePersistentVolumeGrowthAbnormal
       annotations:
@@ -175,5 +177,5 @@ spec:
         ) > {{ .Values.rules.pvc.growthRateCritical }}
       for: 1h
       labels:
-        severity: wip
+        severity: {{ $sevCrit }}
 {{- end }}
