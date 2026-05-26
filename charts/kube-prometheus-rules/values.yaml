@@ -119,6 +119,33 @@ rules:
     # Hours since last successful backup before critical (default: 49h — missed 2 consecutive runs)
     staleCriticalHours: 49
 
+  mimir:
+    enabled: true
+    warningSuppressed: true
+    criticalSuppressed: true
+    # Per-tenant series usage thresholds (% of max_global_series_per_user).
+    perTenantSeriesWarningRatio: 80
+    perTenantSeriesCriticalRatio: 90
+    # Mimir tenant cap — MUST match max_global_series_per_user in the mimir-distributed
+    # values.yaml.gotmpl. The alert divides by this number, so drift between this value
+    # and Mimir's actual limit produces wrong percentages.
+    maxGlobalSeriesPerUser: 5000000
+    # Mimir distributor replication factor — MUST match distributor.ring.replicationFactor
+    # in the mimir-distributed config. Active-series totals are divided by this to recover
+    # the real per-tenant series count.
+    replicationFactor: 3
+    # Per-ingester instance-limit usage thresholds (% of cortex_ingester_instance_limits).
+    # Only fire when ingester.instance_limits.max_series / max_tenants are explicitly set
+    # in Mimir (default is 0 = unlimited, in which case these alerts are no-ops).
+    ingesterSeriesWarningRatio: 80
+    ingesterSeriesCriticalRatio: 90
+    ingesterTenantsWarningRatio: 70
+    ingesterTenantsCriticalRatio: 80
+    # Drop-rate thresholds (samples/sec) for limit-related discards only — out-of-order
+    # and too-old samples are excluded since they reflect client clock skew, not capacity.
+    discardWarnRate: 0
+    discardCritRate: 10
+
 # Runbook URLs for each alert — set to your internal Notion/Confluence pages in the version stream.
 # Leave empty ("") to omit the runbook_url annotation from the PrometheusRule.
 runbooks:
@@ -156,3 +183,8 @@ runbooks:
     cronJobMissedSchedule: ""
   velero:
     backupStale: ""
+  mimir:
+    perTenantSeriesUsage: ""
+    ingesterSeriesLimit: ""
+    ingesterTenantsLimit: ""
+    samplesDiscardedByLimits: ""
