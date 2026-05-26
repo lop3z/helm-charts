@@ -1,0 +1,179 @@
+{{- if .Values.rules.mimir.enabled }}
+{{- $sevWarn := ternary "wip_warning" "warning" .Values.rules.mimir.warningSuppressed }}
+{{- $sevCrit := ternary "wip_critical" "critical" .Values.rules.mimir.criticalSuppressed }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ .Release.Name }}-mimir
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kube-prometheus-rules.labels" . | nindent 4 }}
+    gitops.jenkins-x.io/pipeline: namespaces
+spec:
+  groups:
+  # Per-tenant series cap (max_global_series_per_user). Fires before drops happen.
+  # The chart values maxGlobalSeriesPerUser and replicationFactor MUST match the
+  # values configured in the mimir-distributed chart — drift will produce wrong alerts.
+  - name: mimir.tenant_limits
+    rules:
+    - alert: MimirPerTenantSeriesUsageHigh
+      annotations:
+        description: >
+          Mimir tenant {{ "{{" }} $labels.user {{ "}}" }} is using
+          {{ "{{" }} printf "%.1f" $value {{ "}}" }}% of its max_global_series_per_user cap
+          ({{ printf "%.0f" (.Values.rules.mimir.maxGlobalSeriesPerUser | float64) }}). Raise the limit or reduce
+          high-cardinality scrapes.
+        summary: Mimir per-tenant series usage high ({{ "{{" }} $labels.user {{ "}}" }})
+        {{- with (.Values.runbooks.mimir.perTenantSeriesUsage | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        (
+          sum by (user) (cortex_ingester_active_series)
+          / {{ .Values.rules.mimir.replicationFactor }}
+        ) * 100 / {{ printf "%.0f" (.Values.rules.mimir.maxGlobalSeriesPerUser | float64) }}
+          > {{ .Values.rules.mimir.perTenantSeriesWarningRatio }}
+      for: 15m
+      labels:
+        severity: {{ $sevWarn }}
+
+    - alert: MimirPerTenantSeriesUsageHigh
+      annotations:
+        description: >
+          Mimir tenant {{ "{{" }} $labels.user {{ "}}" }} is using
+          {{ "{{" }} printf "%.1f" $value {{ "}}" }}% of its max_global_series_per_user cap
+          ({{ printf "%.0f" (.Values.rules.mimir.maxGlobalSeriesPerUser | float64) }}). Imminent risk of dropped samples
+          on new series.
+        summary: Mimir per-tenant series usage critical ({{ "{{" }} $labels.user {{ "}}" }})
+        {{- with (.Values.runbooks.mimir.perTenantSeriesUsage | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        (
+          sum by (user) (cortex_ingester_active_series)
+          / {{ .Values.rules.mimir.replicationFactor }}
+        ) * 100 / {{ printf "%.0f" (.Values.rules.mimir.maxGlobalSeriesPerUser | float64) }}
+          > {{ .Values.rules.mimir.perTenantSeriesCriticalRatio }}
+      for: 5m
+      labels:
+        severity: {{ $sevCrit }}
+
+  # Per-ingester instance limits. Ported from upstream mimir-mixin.
+  # These only fire when ingester.instance_limits.max_series / max_tenants are set > 0
+  # in Mimir; with the default (0 = unlimited) the alert is a no-op.
+  - name: mimir.ingester_limits
+    rules:
+    - alert: MimirIngesterReachingSeriesLimit
+      annotations:
+        description: >
+          Mimir ingester {{ "{{" }} $labels.pod {{ "}}" }} has reached
+          {{ "{{" }} printf "%.1f" $value {{ "}}" }}% of its per-instance series limit.
+        summary: Mimir ingester nearing series limit ({{ "{{" }} $labels.pod {{ "}}" }})
+        {{- with (.Values.runbooks.mimir.ingesterSeriesLimit | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        (
+          (cortex_ingester_memory_series / ignoring(limit) cortex_ingester_instance_limits{limit="max_series"})
+          and ignoring(limit) (cortex_ingester_instance_limits{limit="max_series"} > 0)
+        ) * 100 > {{ .Values.rules.mimir.ingesterSeriesWarningRatio }}
+      for: 3h
+      labels:
+        severity: {{ $sevWarn }}
+
+    - alert: MimirIngesterReachingSeriesLimit
+      annotations:
+        description: >
+          Mimir ingester {{ "{{" }} $labels.pod {{ "}}" }} has reached
+          {{ "{{" }} printf "%.1f" $value {{ "}}" }}% of its per-instance series limit.
+          Sample drops imminent.
+        summary: Mimir ingester critically near series limit ({{ "{{" }} $labels.pod {{ "}}" }})
+        {{- with (.Values.runbooks.mimir.ingesterSeriesLimit | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        (
+          (cortex_ingester_memory_series / ignoring(limit) cortex_ingester_instance_limits{limit="max_series"})
+          and ignoring(limit) (cortex_ingester_instance_limits{limit="max_series"} > 0)
+        ) * 100 > {{ .Values.rules.mimir.ingesterSeriesCriticalRatio }}
+      for: 5m
+      labels:
+        severity: {{ $sevCrit }}
+
+    - alert: MimirIngesterReachingTenantsLimit
+      annotations:
+        description: >
+          Mimir ingester {{ "{{" }} $labels.pod {{ "}}" }} is hosting
+          {{ "{{" }} printf "%.1f" $value {{ "}}" }}% of its per-instance tenant limit.
+        summary: Mimir ingester nearing tenants limit ({{ "{{" }} $labels.pod {{ "}}" }})
+        {{- with (.Values.runbooks.mimir.ingesterTenantsLimit | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        (
+          (cortex_ingester_memory_users / ignoring(limit) cortex_ingester_instance_limits{limit="max_tenants"})
+          and ignoring(limit) (cortex_ingester_instance_limits{limit="max_tenants"} > 0)
+        ) * 100 > {{ .Values.rules.mimir.ingesterTenantsWarningRatio }}
+      for: 5m
+      labels:
+        severity: {{ $sevWarn }}
+
+    - alert: MimirIngesterReachingTenantsLimit
+      annotations:
+        description: >
+          Mimir ingester {{ "{{" }} $labels.pod {{ "}}" }} is hosting
+          {{ "{{" }} printf "%.1f" $value {{ "}}" }}% of its per-instance tenant limit.
+        summary: Mimir ingester critically near tenants limit ({{ "{{" }} $labels.pod {{ "}}" }})
+        {{- with (.Values.runbooks.mimir.ingesterTenantsLimit | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        (
+          (cortex_ingester_memory_users / ignoring(limit) cortex_ingester_instance_limits{limit="max_tenants"})
+          and ignoring(limit) (cortex_ingester_instance_limits{limit="max_tenants"} > 0)
+        ) * 100 > {{ .Values.rules.mimir.ingesterTenantsCriticalRatio }}
+      for: 5m
+      labels:
+        severity: {{ $sevCrit }}
+
+  # Reactive backstop — fires only on limit-related discards (series, metric, rate, label).
+  # Reasons like sample-out-of-order and sample-timestamp-too-old are excluded as they reflect
+  # client clock skew, not capacity issues. Reason regex matches both underscore and dash variants.
+  - name: mimir.discards
+    rules:
+    - alert: MimirSamplesDiscardedByLimits
+      annotations:
+        description: >
+          Mimir is discarding samples on tenant {{ "{{" }} $labels.user {{ "}}" }}
+          for reason "{{ "{{" }} $labels.reason {{ "}}" }}" at
+          {{ "{{" }} printf "%.2f" $value {{ "}}" }} samples/sec.
+        summary: Mimir samples discarded due to limit ({{ "{{" }} $labels.reason {{ "}}" }})
+        {{- with (.Values.runbooks.mimir.samplesDiscardedByLimits | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        sum by (user, reason) (
+          rate(cortex_discarded_samples_total{reason=~"(per[_-]user[_-]series[_-]limit|per[_-]metric[_-]series[_-]limit|rate[_-]limited|max[_-]label[_-].*)"}[5m])
+        ) > {{ .Values.rules.mimir.discardWarnRate }}
+      for: 5m
+      labels:
+        severity: {{ $sevWarn }}
+
+    - alert: MimirSamplesDiscardedByLimits
+      annotations:
+        description: >
+          Mimir is discarding samples on tenant {{ "{{" }} $labels.user {{ "}}" }}
+          for reason "{{ "{{" }} $labels.reason {{ "}}" }}" at
+          {{ "{{" }} printf "%.2f" $value {{ "}}" }} samples/sec — sustained data loss.
+        summary: Mimir sustained sample loss ({{ "{{" }} $labels.reason {{ "}}" }})
+        {{- with (.Values.runbooks.mimir.samplesDiscardedByLimits | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        sum by (user, reason) (
+          rate(cortex_discarded_samples_total{reason=~"(per[_-]user[_-]series[_-]limit|per[_-]metric[_-]series[_-]limit|rate[_-]limited|max[_-]label[_-].*)"}[5m])
+        ) > {{ .Values.rules.mimir.discardCritRate }}
+      for: 5m
+      labels:
+        severity: {{ $sevCrit }}
+{{- end }}
