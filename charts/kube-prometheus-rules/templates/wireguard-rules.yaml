@@ -1,0 +1,136 @@
+{{- if .Values.rules.wireguard.enabled }}
+{{- $sevWarn := ternary "wip_warning" "warning" .Values.rules.wireguard.warningSuppressed }}
+{{- $sevCrit := ternary "wip_critical" "critical" .Values.rules.wireguard.criticalSuppressed }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ .Release.Name }}-wireguard
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kube-prometheus-rules.labels" . | nindent 4 }}
+    gitops.jenkins-x.io/pipeline: namespaces
+spec:
+  groups:
+  - name: wireguard
+    rules:
+    # ── Tunnel handshake age — the primary "tunnel down" signal ─────────────
+    - alert: WireGuardTunnelHandshakeStale
+      annotations:
+        description: >
+          WireGuard tunnel on {{ "{{" }} $labels.instance {{ "}}" }} hasn't completed a handshake
+          in {{ "{{" }} printf "%.0fs" $value {{ "}}" }} (threshold: {{ .Values.rules.wireguard.handshakeStaleSeconds }}s).
+          cluster_region={{ "{{" }} $labels.cluster_region {{ "}}" }}
+        summary: WireGuard handshake stale ({{ "{{" }} $labels.instance {{ "}}" }})
+        {{- with (.Values.runbooks.wireguard.handshakeStale | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        time() - wireguard_latest_handshake_seconds > {{ .Values.rules.wireguard.handshakeStaleSeconds }}
+      for: 2m
+      labels:
+        severity: {{ $sevWarn }}
+
+    - alert: WireGuardTunnelHandshakeStale
+      annotations:
+        description: >
+          WireGuard tunnel on {{ "{{" }} $labels.instance {{ "}}" }} hasn't completed a handshake
+          for over 5 minutes. Immediate action required.
+        summary: WireGuard handshake persistently stale ({{ "{{" }} $labels.instance {{ "}}" }})
+        {{- with (.Values.runbooks.wireguard.handshakeStale | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        time() - wireguard_latest_handshake_seconds > {{ .Values.rules.wireguard.handshakeStaleSeconds }}
+      for: 5m
+      labels:
+        severity: {{ $sevCrit }}
+
+    # ── Gateway VM unreachable — node_exporter or VM itself down ────────────
+    - alert: WireGuardGatewayDown
+      annotations:
+        description: >
+          WireGuard gateway VM {{ "{{" }} $labels.instance {{ "}}" }} is not responding to scrape.
+          cluster_region={{ "{{" }} $labels.cluster_region {{ "}}" }}
+        summary: WireGuard gateway down ({{ "{{" }} $labels.instance {{ "}}" }})
+        {{- with (.Values.runbooks.wireguard.gatewayDown | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        up{job="wireguard"} == 0
+      for: 2m
+      labels:
+        severity: {{ $sevWarn }}
+
+    - alert: WireGuardGatewayDown
+      annotations:
+        description: >
+          WireGuard gateway VM {{ "{{" }} $labels.instance {{ "}}" }} has been unreachable for 5m.
+          cluster_region={{ "{{" }} $labels.cluster_region {{ "}}" }}
+        summary: WireGuard gateway persistently down ({{ "{{" }} $labels.instance {{ "}}" }})
+        {{- with (.Values.runbooks.wireguard.gatewayDown | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        up{job="wireguard"} == 0
+      for: 5m
+      labels:
+        severity: {{ $sevCrit }}
+
+    # ── Dead-man's-switch: a whole region stopped reporting ─────────────────
+    # `absent_over_time` fires when expected `up{job="wireguard"}` series for a given
+    # cluster_region have been missing for the full window. Catches the case where
+    # the local Alloy is dead or the cluster can't remote_write to Mimir — i.e.
+    # nothing else can detect because there's no data to evaluate against.
+    {{- range $region := .Values.rules.wireguard.deadManRegions }}
+    - alert: WireGuardMetricsAbsent
+      annotations:
+        description: >
+          No WireGuard metrics from cluster_region={{ $region }} for over
+          {{ $.Values.rules.wireguard.deadManAbsentMinutes }}m. Either the local Alloy
+          is down, the cluster can't remote_write, or all WG VMs in that region are gone.
+        summary: WireGuard metrics absent ({{ $region }})
+        {{- with ($.Values.runbooks.wireguard.metricsAbsent | default $.Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        absent_over_time(up{job="wireguard",cluster_region="{{ $region }}"}[{{ $.Values.rules.wireguard.deadManAbsentMinutes }}m]) == 1
+      for: 0m
+      labels:
+        severity: {{ $sevWarn }}
+        cluster_region: {{ $region }}
+    {{- end }}
+
+    # ── Keepalived master state changed (info — failover event) ─────────────
+    # Fires on every VRRP transition. Severity: info — failover is a normal
+    # operational event (drills, brief peer flaps, etc.) — informational, not pageworthy.
+    - alert: KeepalivedMasterChanged
+      annotations:
+        description: >
+          keepalived_is_master changed on {{ "{{" }} $labels.instance {{ "}}" }} for VIP {{ "{{" }} $labels.vip {{ "}}" }}
+          in the last 5 minutes. Could be a normal failover, a drill, or unexpected flapping.
+        summary: Keepalived state change on {{ "{{" }} $labels.instance {{ "}}" }} (VIP {{ "{{" }} $labels.vip {{ "}}" }})
+        {{- with (.Values.runbooks.wireguard.masterChanged | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        changes(keepalived_is_master[5m]) > 0
+      for: 0m
+      labels:
+        severity: info
+
+    # ── Keepalived flapping (warning — sustained failover loop) ─────────────
+    - alert: KeepalivedFlapping
+      annotations:
+        description: >
+          keepalived_is_master changed {{ "{{" }} $value {{ "}}" }} times on {{ "{{" }} $labels.instance {{ "}}" }}
+          (VIP {{ "{{" }} $labels.vip {{ "}}" }}) in the last 15 minutes — likely a track script bouncing right at threshold.
+        summary: Keepalived flapping on {{ "{{" }} $labels.instance {{ "}}" }}
+        {{- with (.Values.runbooks.wireguard.flapping | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        changes(keepalived_is_master[15m]) >= {{ .Values.rules.wireguard.flapThreshold }}
+      for: 0m
+      labels:
+        severity: {{ $sevWarn }}
+{{- end }}

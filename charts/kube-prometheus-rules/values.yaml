@@ -119,6 +119,25 @@ rules:
     # Hours since last successful backup before critical (default: 49h — missed 2 consecutive runs)
     staleCriticalHours: 49
 
+  wireguard:
+    enabled: true
+    warningSuppressed: true
+    criticalSuppressed: true
+    # Handshake age threshold — seconds since last successful WG handshake before
+    # we treat the tunnel as stale. Warning at 2m breach, critical at 5m.
+    handshakeStaleSeconds: 180
+    # Dead-man's-switch — if no `up{job="wireguard"}` series for a cluster_region in this
+    # window, fire. Evaluated on the central Mimir ruler so it works even when the
+    # affected cluster can't remote_write at all.
+    deadManAbsentMinutes: 10
+    # Cluster regions to evaluate the dead-man's-switch against — one alert per region.
+    # Add a new region here when a new cluster starts scraping WG VMs.
+    deadManRegions:
+      - bhs5
+      - us-va1
+    # Keepalived flap detection — warn when this many master-state changes happen in 15m.
+    flapThreshold: 3
+
 # Runbook URLs for each alert — set to your internal Notion/Confluence pages in the version stream.
 # Leave empty ("") to omit the runbook_url annotation from the PrometheusRule.
 runbooks:
@@ -156,3 +175,9 @@ runbooks:
     cronJobMissedSchedule: ""
   velero:
     backupStale: ""
+  wireguard:
+    handshakeStale: ""
+    gatewayDown: ""
+    metricsAbsent: ""
+    masterChanged: ""
+    flapping: ""
