@@ -137,6 +137,10 @@ rules:
       - us-va1
     # Keepalived flap detection — warn when this many master-state changes happen in 15m.
     flapThreshold: 3
+    # WireGuard throughput alert threshold (bytes/sec, rx+tx 5m avg).
+    # Default intentionally low (10 KB/s) so the alert fires in dev for validation.
+    # Raise to a realistic capacity planning threshold once baseline traffic is known.
+    highThroughputBytesPerSec: 10240
 
 # Runbook URLs for each alert — set to your internal Notion/Confluence pages in the version stream.
 # Leave empty ("") to omit the runbook_url annotation from the PrometheusRule.
@@ -180,4 +184,5 @@ runbooks:
     gatewayDown: ""
     metricsAbsent: ""
     masterChanged: ""
+    highThroughput: ""
     flapping: ""
