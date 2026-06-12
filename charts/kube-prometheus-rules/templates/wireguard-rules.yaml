@@ -118,6 +118,29 @@ spec:
       labels:
         severity: info
 
+    # ── WireGuard throughput high — fires when rx+tx rate exceeds threshold ─
+    # Default threshold is intentionally low so the alert fires in dev/test for
+    # validation. Bump `highThroughputBytesPerSec` in the version stream once
+    # baseline traffic is known. Useful for capacity planning + anomaly spotting.
+    - alert: WireGuardHighThroughput
+      annotations:
+        description: >
+          WireGuard throughput on {{ "{{" }} $labels.instance {{ "}}" }} is
+          {{ "{{" }} printf "%.0f B/s" $value {{ "}}" }} (rx+tx, 5m avg), above the
+          {{ .Values.rules.wireguard.highThroughputBytesPerSec }} B/s threshold.
+          cluster_region={{ "{{" }} $labels.cluster_region {{ "}}" }}
+        summary: WireGuard high throughput ({{ "{{" }} $labels.instance {{ "}}" }})
+        {{- with (.Values.runbooks.wireguard.highThroughput | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        sum by (instance, cluster_region) (
+          rate(wireguard_received_bytes_total[5m]) + rate(wireguard_sent_bytes_total[5m])
+        ) > {{ .Values.rules.wireguard.highThroughputBytesPerSec }}
+      for: 1m
+      labels:
+        severity: {{ $sevWarn }}
+
     # ── Keepalived flapping (warning — sustained failover loop) ─────────────
     - alert: KeepalivedFlapping
       annotations:
