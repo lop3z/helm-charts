@@ -3,6 +3,19 @@ entries:
   grafana-dashboards:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-06-12T08:29:25.087243571Z"
+    description: Grafana dashboards for Kubernetes observability — PVC, Node Exporter,
+      Alerts Overview, WireGuard tunnels
+    digest: dd065a8fc0ea8717d5a19f024a5302aed6e71c2fe841c493fb5477f913066d63
+    maintainers:
+    - name: lop3z
+    name: grafana-dashboards
+    type: application
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/grafana-dashboards-0.3.0/grafana-dashboards-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-05-04T08:52:40.359292635Z"
     description: Grafana dashboards for Kubernetes observability — PVC, Node Exporter,
       Alerts Overview
@@ -2037,4 +2050,4 @@ entries:
     urls:
     - https://github.com/lop3z/helm-charts/releases/download/wireguard-0.4.0/wireguard-0.4.0.tgz
     version: 0.4.0
-generated: "2026-06-02T14:00:20.149611172Z"
+generated: "2026-06-12T08:29:25.087498965Z"
