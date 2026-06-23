@@ -1,0 +1,9 @@
+apiVersion: netbird.io/v1alpha1
+kind: NetworkRouter
+metadata:
+  name: {{ .Values.router.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  dnsZoneRef:
+    name: {{ .Values.dnsZone }}
+  logLevel: {{ .Values.router.logLevel }}

@@ -1,0 +1,37 @@
+# Access model: the access groups (e.g. netbird-clickhouse / netbird-mongo) are JWT-issued by NetBird
+# from same-named Keycloak realm roles — this chart does NOT create them, and the operator must NOT
+# (an api-issued group can't be populated by JWT sync). Access is granted by per-resource NetBird
+# policies (manual — see README "Manual steps"). This chart manages only the routing peer + the
+# in-cluster Services + the NetworkResources. All cluster-specific values below are meant to be
+# supplied per cluster via versionStream; the defaults are conservative placeholders.
+
+# REQUIRED per cluster: the NetBird DNS zone the router registers resources under (must already
+# exist in the NetBird management — the operator looks it up by name, never creates it).
+dnsZone: ""
+
+# Routing peer that joins the NetBird network and routes into ClusterIP space (one per namespace).
+router:
+  name: db-access-router
+  logLevel: info
+
+# In-cluster Services to expose. serviceRef is same-namespace; a NetworkResource exposes the whole
+# Service (all ports).
+services:
+  mongos: mongo-netbird
+  clickhouse: clickhouse-netbird
+
+# Wrap an OUT-OF-CLUSTER endpoint (e.g. external mongos) in a selector-less ClusterIP + Endpoints,
+# since the operator can only reference a ClusterIP Service. Set create:false when the target
+# Service already has its own endpoints.
+mongoService:
+  create: false
+  name: mongo-netbird
+  externalHost: ""        # REQUIRED when create:true — the off-cluster host IP
+  port: 27017
+
+# Add a plain ClusterIP for an in-cluster service whose own Service is NodePort/headless.
+clickhouseService:
+  create: false
+  name: clickhouse-netbird
+  selector: {}
+  ports: []
