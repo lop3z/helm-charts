@@ -1,0 +1,15 @@
+apiVersion: netbird.io/v1alpha1
+kind: NetworkResource
+metadata:
+  name: mongos
+  namespace: {{ .Release.Namespace }}
+spec:
+  networkRouterRef:
+    name: {{ .Values.router.name }}
+    namespace: {{ .Release.Namespace }}
+  serviceRef:
+    name: {{ .Values.services.mongos }}
+  # No groups: the access group (netbird-mongo) is JWT-issued by NetBird from the Keycloak realm
+  # role, so the operator must NOT own that name (an operator/api group can't be populated by JWT
+  # sync). Access is granted by a per-resource policy (destinationResource by ID, source = the jwt
+  # group) — see README "Manual steps".

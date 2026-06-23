@@ -1,0 +1,17 @@
+# One NetworkResource exposes the whole clickhouse Service (native 9000 + http 8123);
+# the CRD's serviceRef has no per-port field.
+apiVersion: netbird.io/v1alpha1
+kind: NetworkResource
+metadata:
+  name: clickhouse
+  namespace: {{ .Release.Namespace }}
+spec:
+  networkRouterRef:
+    name: {{ .Values.router.name }}
+    namespace: {{ .Release.Namespace }}
+  serviceRef:
+    name: {{ .Values.services.clickhouse }}
+  # No groups: the access group (netbird-clickhouse) is JWT-issued by NetBird from the Keycloak
+  # realm role, so the operator must NOT own that name (an operator/api group can't be populated by
+  # JWT sync). Access is granted by a per-resource policy (destinationResource by ID, source = the
+  # jwt group) — see README "Manual steps".
