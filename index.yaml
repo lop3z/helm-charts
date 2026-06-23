@@ -1117,6 +1117,18 @@ entries:
     urls:
     - https://github.com/pmint93/helm-charts/releases/download/metabase-0.13.0/metabase-0.13.0.tgz
     version: 0.13.0
+  netbird-access:
+  - apiVersion: v2
+    appVersion: 0.6.0
+    created: "2026-06-23T20:22:30.381264299Z"
+    description: NetBird CRs exposing in-cluster Mongo & ClickHouse over WireGuard,
+      access via JWT-issued per-DB groups (DEV-123)
+    digest: 5bce11df6482000e31219d68d6fd9145eeb127b8e5cdedda38a5b8589f9ee3f0
+    name: netbird-access
+    type: application
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/netbird-access-0.2.0/netbird-access-0.2.0.tgz
+    version: 0.2.0
   pgbouncer:
   - apiVersion: v2
     appVersion: v1.21.0
@@ -2063,4 +2075,4 @@ entries:
     urls:
     - https://github.com/lop3z/helm-charts/releases/download/wireguard-0.4.0/wireguard-0.4.0.tgz
     version: 0.4.0
-generated: "2026-06-12T08:50:01.19016249Z"
+generated: "2026-06-23T20:22:30.381558397Z"
