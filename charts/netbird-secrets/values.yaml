@@ -1,0 +1,14 @@
+# Operator API-key Secret — name/key must match netbirdAPI.keyFromSecret in the netbird-operator values.
+# Disabled until the NetBird service-user PAT exists in Vault (post-login bootstrap); enabled with
+# the operator release in a follow-up.
+createApiKeySecret: true
+secretName: netbird-mgmt-api-key
+# Vault path holding the NetBird management API key (PAT). Leading slash per repo convention.
+vaultRef: vault:/secret/data/netbird#NB_API_KEY
+
+# Control-plane Secret consumed (as env) by the management + relay pods and substituted into
+# management.json at runtime. Keys must match the netbird/netbird chart's envFromSecret refs.
+controlPlaneSecretName: netbird-cp-secrets
+controlPlane:
+  DATASTORE_ENCRYPTION_KEY: vault:/secret/data/netbird#DATASTORE_ENCRYPTION_KEY
+  RELAY_PASSWORD: vault:/secret/data/netbird#RELAY_PASSWORD
