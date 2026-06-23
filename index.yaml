@@ -1129,6 +1129,18 @@ entries:
     urls:
     - https://github.com/lop3z/helm-charts/releases/download/netbird-access-0.2.0/netbird-access-0.2.0.tgz
     version: 0.2.0
+  netbird-secrets:
+  - apiVersion: v2
+    appVersion: 0.6.0
+    created: "2026-06-23T21:35:42.017028442Z"
+    description: Vault-backed Secrets for self-hosted NetBird — operator API key (PAT)
+      + control-plane (datastore encryption key, relay password) (DEV-123)
+    digest: 8de63c49d16cf8792941752c3708ace7eb45629825a04f666fa474073a2db0f1
+    name: netbird-secrets
+    type: application
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/netbird-secrets-0.1.0/netbird-secrets-0.1.0.tgz
+    version: 0.1.0
   pgbouncer:
   - apiVersion: v2
     appVersion: v1.21.0
@@ -2075,4 +2087,4 @@ entries:
     urls:
     - https://github.com/lop3z/helm-charts/releases/download/wireguard-0.4.0/wireguard-0.4.0.tgz
     version: 0.4.0
-generated: "2026-06-23T20:22:30.381558397Z"
+generated: "2026-06-23T21:35:42.017224778Z"
