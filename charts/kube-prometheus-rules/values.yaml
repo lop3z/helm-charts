@@ -63,8 +63,8 @@ rules:
     # Normalized load (load15 / cpu_count) thresholds.
     # Using the 15-minute average smooths out short spikes that don't reflect
     # sustained pressure on the node.
-    loadWarningRatio: 1.20
-    loadCriticalRatio: 1.50
+    loadWarningRatio: 1.50
+    loadCriticalRatio: 2.00
 
   workload:
     enabled: true
