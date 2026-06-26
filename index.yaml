@@ -1133,6 +1133,17 @@ entries:
   netbird-access:
   - apiVersion: v2
     appVersion: 0.6.0
+    created: "2026-06-26T22:18:38.548159115Z"
+    description: NetBird CRs (router + resources + wrappers) exposing in-cluster services
+      over WireGuard, configurable per cluster (DEV-123)
+    digest: a62534078227d738b39b83c52daba6cbbdb04444ede6daebccf9749f834c453e
+    name: netbird-access
+    type: application
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/netbird-access-0.3.0/netbird-access-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
+    appVersion: 0.6.0
     created: "2026-06-23T20:22:30.381264299Z"
     description: NetBird CRs exposing in-cluster Mongo & ClickHouse over WireGuard,
       access via JWT-issued per-DB groups (DEV-123)
@@ -2100,4 +2111,4 @@ entries:
     urls:
     - https://github.com/lop3z/helm-charts/releases/download/wireguard-0.4.0/wireguard-0.4.0.tgz
     version: 0.4.0
-generated: "2026-06-25T23:41:14.815629014Z"
+generated: "2026-06-26T22:18:38.548464016Z"
