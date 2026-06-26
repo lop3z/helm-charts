@@ -1,0 +1,16 @@
+{{- range .Values.clusterIpServices }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    app.kubernetes.io/managed-by: netbird-access
+spec:
+  type: ClusterIP
+  selector:
+    {{- toYaml .selector | nindent 4 }}
+  ports:
+    {{- toYaml .ports | nindent 4 }}
+{{- end }}

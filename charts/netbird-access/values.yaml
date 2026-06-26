@@ -1,37 +1,31 @@
-# Access model: the access groups (e.g. netbird-clickhouse / netbird-mongo) are JWT-issued by NetBird
-# from same-named Keycloak realm roles — this chart does NOT create them, and the operator must NOT
-# (an api-issued group can't be populated by JWT sync). Access is granted by per-resource NetBird
-# policies (manual — see README "Manual steps"). This chart manages only the routing peer + the
-# in-cluster Services + the NetworkResources. All cluster-specific values below are meant to be
-# supplied per cluster via versionStream; the defaults are conservative placeholders.
+# Generic NetBird DB-access chart. All cluster-specific values are supplied per cluster
+# (via versionStream / jx-values) — defaults below are empty/placeholder.
+#
+# Access groups (e.g. netbird-clickhouse) are JWT-issued by NetBird from same-named Keycloak realm
+# roles — this chart does NOT create them. Access is granted by per-resource policies (manual; see
+# README). This chart manages only: the NetworkRouter (→ operator creates the routing-peer pod),
+# the NetworkResources, and optional wrapper Services.
 
-# REQUIRED per cluster: the NetBird DNS zone the router registers resources under (must already
-# exist in the NetBird management — the operator looks it up by name, never creates it).
+# NetBird DNS zone the router registers resources under (must already exist in the management).
 dnsZone: ""
 
-# Routing peer that joins the NetBird network and routes into ClusterIP space (one per namespace).
+# Routing peer (one per namespace). The operator turns this CR into the routing-peer pod.
 router:
   name: db-access-router
   logLevel: info
 
-# In-cluster Services to expose. serviceRef is same-namespace; a NetworkResource exposes the whole
-# Service (all ports).
-services:
-  mongos: mongo-netbird
-  clickhouse: clickhouse-netbird
+# NetworkResources to expose — one per entry. serviceRef = an in-cluster Service (its ClusterIP).
+#   resources:
+#     - { name: redis, serviceRef: redis-cluster }
+resources: []
 
-# Wrap an OUT-OF-CLUSTER endpoint (e.g. external mongos) in a selector-less ClusterIP + Endpoints,
-# since the operator can only reference a ClusterIP Service. Set create:false when the target
-# Service already has its own endpoints.
-mongoService:
-  create: false
-  name: mongo-netbird
-  externalHost: ""        # REQUIRED when create:true — the off-cluster host IP
-  port: 27017
+# Optional plain-ClusterIP wrappers (for in-cluster services that are NodePort/headless, or to scope
+# ports). e.g.
+#   - name: clickhouse-netbird
+#     selector: { app.kubernetes.io/name: clickhouse, app.kubernetes.io/instance: clickhouse, app.kubernetes.io/component: clickhouse }
+#     ports: [ { name: http, port: 8123 }, { name: tcp, port: 9000 } ]
+clusterIpServices: []
 
-# Add a plain ClusterIP for an in-cluster service whose own Service is NodePort/headless.
-clickhouseService:
-  create: false
-  name: clickhouse-netbird
-  selector: {}
-  ports: []
+# Optional selector-less Service + Endpoints (for OFF-cluster targets, e.g. external mongos). e.g.
+#   - { name: mongo-netbird, portName: mongo, externalHost: 51.68.95.180, port: 27017 }
+externalServices: []
