@@ -1,0 +1,17 @@
+{{- /* One NetworkResource per .Values.resources entry. serviceRef = the in-cluster Service to
+expose (the NetworkResource exposes the whole Service / all its ports). No groups on the resource:
+the access group is JWT-issued, and access is granted by a per-resource policy (see README). */}}
+{{- range .Values.resources }}
+---
+apiVersion: netbird.io/v1alpha1
+kind: NetworkResource
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  networkRouterRef:
+    name: {{ $.Values.router.name }}
+    namespace: {{ $.Release.Namespace }}
+  serviceRef:
+    name: {{ .serviceRef }}
+{{- end }}

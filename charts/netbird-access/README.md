@@ -1,18 +1,30 @@
 # netbird-access
 
-Exposes databases to NetBird peers via the NetBird Kubernetes operator, with **per-database**
-least-privilege groups (`netbird-clickhouse`, `netbird-mongo`). Part of DEV-123.
+Exposes in-cluster services to NetBird peers via the NetBird Kubernetes operator. Generic and
+**list-driven** — each cluster supplies its own resources (typically via `jx-values`). Part of DEV-123.
 
 ## What this chart manages (GitOps)
-- `NetworkRouter` (`router.name`) — operator deploys the routing-peer pods, registered under `dnsZone`.
-- `NetworkResource` ×2 — **no group on the resource**; access is granted by a per-resource policy:
-  - **clickhouse** → `clickhouseService` ClusterIP (for when the app's own Service is NodePort/headless)
-  - **mongos** → `mongoService` selector-less ClusterIP → external mongos (`mongoService.externalHost`, for when MongoDB is off-cluster)
-- The two optional Services above (`clickhouseService.create` / `mongoService.create`).
+- `NetworkRouter` (`router.name`) — the operator turns this CR into the routing-peer pod, registered under `dnsZone`.
+- `NetworkResource` ×N — one per `resources[]` entry; **no group on the resource** (access is a per-resource policy).
+- Optional `clusterIpServices[]` — plain ClusterIP wrappers (for in-cluster NodePort/headless services, or to scope ports).
+- Optional `externalServices[]` — selector-less Service + Endpoints (for off-cluster targets, e.g. an external mongos).
 
-**All cluster-specific values** (`dnsZone`, `router.name`, `mongoService.externalHost`, selectors) are
-supplied **per cluster via versionStream** — see `values.yaml` for the keys. Examples below use the
-SBG5-dev values (`jx-staging-router`, `sbg5.dev.netbird.lop3z.one`, external mongos `51.68.95.180`).
+```yaml
+dnsZone: <region>.dev.netbird.<domain>      # supplied per cluster (jx-values)
+router: { name: jx-staging-router }
+resources:
+  - { name: redis,      serviceRef: redis-cluster }      # point straight at an existing ClusterIP
+  - { name: clickhouse, serviceRef: clickhouse-netbird } # or at a wrapper below
+clusterIpServices:                                       # only if you need a wrapper / port-scope
+  - { name: clickhouse-netbird, selector: {...}, ports: [ {name: http, port: 8123}, {name: tcp, port: 9000} ] }
+externalServices:                                        # only for off-cluster targets
+  - { name: mongo-netbird, portName: mongo, externalHost: 51.68.95.180, port: 27017 }
+```
+
+> **When do you need a wrapper?** Point `serviceRef` straight at an existing Service when it's an
+> in-cluster **ClusterIP with the ports you want**. Add a `clusterIpServices` wrapper to **scope ports**
+> (a `NetworkResource` exposes the *whole* Service) or for NodePort/headless services. Add an
+> `externalServices` wrapper only for **off-cluster** endpoints (no in-cluster pods/endpoints).
 
 **This chart does NOT create the access Groups or any SetupKeys** — see the access model below for why.
 
