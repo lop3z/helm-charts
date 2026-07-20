@@ -1,0 +1,135 @@
+{{- if .Values.rules.loadbalancer.enabled }}
+{{- $sevWarn := ternary "wip_warning" "warning" .Values.rules.loadbalancer.warningSuppressed }}
+{{- $sevCrit := ternary "wip_critical" "critical" .Values.rules.loadbalancer.criticalSuppressed }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ .Release.Name }}-loadbalancer
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kube-prometheus-rules.labels" . | nindent 4 }}
+    gitops.jenkins-x.io/pipeline: namespaces
+spec:
+  groups:
+  - name: kubernetes.loadbalancer
+    rules:
+    # Critical: a single dead region must fire even while other regions keep the sum positive.
+    - alert: LoadbalancerNoConnectedPeers
+      annotations:
+        summary: Loadbalancer has no connected peers ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          The loadbalancer in {{ "{{" }} $labels.cluster_region {{ "}}" }} has
+          {{ .Values.rules.loadbalancer.noConnectedPeersThreshold }} or fewer connected peers.
+        {{- with (.Values.runbooks.loadbalancer.noConnectedPeers | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        sum by (cluster_region) (load_balancer_db_peers_connected) <= {{ .Values.rules.loadbalancer.noConnectedPeersThreshold }}
+      for: 5m
+      labels:
+        severity: {{ $sevCrit }}
+
+    - alert: LoadbalancerHighProviderSelectionLatency
+      annotations:
+        summary: High provider selection latency ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          P99 provider selection latency in {{ "{{" }} $labels.cluster_region {{ "}}" }} is above
+          {{ .Values.rules.loadbalancer.latencyWarningSeconds }}s
+          (current: {{ "{{" }} printf "%.3f" $value {{ "}}" }}s).
+        {{- with (.Values.runbooks.loadbalancer.providerLatency | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        histogram_quantile(0.99, sum(rate(load_balancer_find_provider_duration_bucket[5m])) by (cluster_region, le)) > {{ .Values.rules.loadbalancer.latencyWarningSeconds }}
+      for: 5m
+      labels:
+        severity: {{ $sevWarn }}
+
+    # kind="blocked" — the metric never had kind="blacklisted" (valid: normal|blocked|probation|throttled|expiration)
+    - alert: LoadbalancerHighBlacklistRate
+      annotations:
+        summary: High number of blocked IPs ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          More than {{ .Values.rules.loadbalancer.blacklistThreshold }} IPs are blocked by the
+          rate limiter in {{ "{{" }} $labels.cluster_region {{ "}}" }}
+          (current: {{ "{{" }} $value {{ "}}" }}).
+        {{- with (.Values.runbooks.loadbalancer.blacklistRate | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        sum by (cluster_region) (load_balancer_rate_limiter_entries_ip{kind="blocked"}) > {{ .Values.rules.loadbalancer.blacklistThreshold }}
+      for: 5m
+      labels:
+        severity: {{ $sevWarn }}
+
+    - alert: LoadbalancerHighThrottleRate
+      annotations:
+        summary: High request throttling rate ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          More than {{ .Values.rules.loadbalancer.throttleRatePerMin }} requests/min are being
+          throttled in {{ "{{" }} $labels.cluster_region {{ "}}" }}
+          (current: {{ "{{" }} printf "%.0f" $value {{ "}}" }}/min).
+        {{- with (.Values.runbooks.loadbalancer.throttleRate | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        sum by (cluster_region) (rate(load_balancer_rate_limiter_throttle_wait_seconds_count[5m])) * 60 > {{ .Values.rules.loadbalancer.throttleRatePerMin }}
+      for: 15m
+      labels:
+        severity: {{ $sevWarn }}
+
+    - alert: LoadbalancerConnectionTimeouts
+      annotations:
+        summary: High connection timeout rate ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          More than {{ .Values.rules.loadbalancer.connectionTimeoutsPerMin }} timeout disconnects/min
+          in {{ "{{" }} $labels.cluster_region {{ "}}" }}
+          (current: {{ "{{" }} printf "%.0f" $value {{ "}}" }}/min).
+        {{- with (.Values.runbooks.loadbalancer.connectionTimeouts | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        sum by (cluster_region) (rate(protocol_customer_node_consecutive_timeout_disconnects[5m])) * 60 > {{ .Values.rules.loadbalancer.connectionTimeoutsPerMin }}
+      for: 5m
+      labels:
+        severity: {{ $sevWarn }}
+
+    - alert: LoadbalancerGeoIPCacheMissRate
+      annotations:
+        summary: High GeoIP cache miss rate ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          GeoIP cache miss rate in {{ "{{" }} $labels.cluster_region {{ "}}" }} is above
+          {{ .Values.rules.loadbalancer.geoipCacheMissPercent }}%
+          (current: {{ "{{" }} printf "%.1f" $value {{ "}}" }}%).
+        {{- with (.Values.runbooks.loadbalancer.geoipCacheMiss | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        (
+          sum by (cluster_region) (rate(geoip_lookup{lookup_from="http"}[5m]))
+          /
+          sum by (cluster_region) (rate(geoip_lookup[5m]))
+        ) * 100 > {{ .Values.rules.loadbalancer.geoipCacheMissPercent }}
+      for: 10m
+      labels:
+        severity: {{ $sevWarn }}
+
+    # The only emitted series is metric="queued", set to the channel's FREE capacity
+    # (Tokio Receiver::capacity() on the 100k channel), so the comparison is inverted:
+    # fire when free slots drop below the threshold.
+    - alert: LoadbalancerSessionCleanupBacklog
+      annotations:
+        summary: Session cleanup backlog growing ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          Session cleanup queue in {{ "{{" }} $labels.cluster_region {{ "}}" }} has fewer than
+          {{ .Values.rules.loadbalancer.sessionCleanupFreeSlotsMin }} free slots of 100000
+          (current: {{ "{{" }} $value {{ "}}" }}).
+        {{- with (.Values.runbooks.loadbalancer.sessionCleanupBacklog | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        load_balancer_session_cleanup_queue_channel_metrics{metric="queued"} < {{ .Values.rules.loadbalancer.sessionCleanupFreeSlotsMin }}
+      for: 5m
+      labels:
+        severity: {{ $sevWarn }}
+{{- end }}

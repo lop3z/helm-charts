@@ -142,6 +142,28 @@ rules:
     # Raise to a realistic capacity planning threshold once baseline traffic is known.
     highThroughputBytesPerSec: 10240
 
+  loadbalancer:
+    enabled: true
+    warningSuppressed: true
+    criticalSuppressed: true
+    # Critical: connected peers per region at or below this count (a single dead
+    # region must fire — the expr aggregates by cluster_region, not globally).
+    noConnectedPeersThreshold: 0
+    # Warning: p99 provider-selection latency (seconds).
+    latencyWarningSeconds: 0.5
+    # Warning: IPs in the rate limiter's kind="blocked" state per region.
+    blacklistThreshold: 100
+    # Warning: throttled requests/min per region. Set above every region's 30d p99
+    # (1.4k–22k/min, peaks 60k) so only genuine storm events fire.
+    throttleRatePerMin: 30000
+    # Warning: consecutive-timeout disconnects/min per region.
+    connectionTimeoutsPerMin: 30
+    # Warning: GeoIP HTTP-lookup (cache miss) ratio per region (%).
+    geoipCacheMissPercent: 50
+    # Warning: free slots remaining on the 100k session-cleanup channel. The app
+    # gauge reports FREE capacity, so this fires when free slots drop below the value.
+    sessionCleanupFreeSlotsMin: 10000
+
 # Runbook URLs for each alert — set to your internal Notion/Confluence pages in the version stream.
 # Leave empty ("") to omit the runbook_url annotation from the PrometheusRule.
 runbooks:
@@ -186,3 +208,11 @@ runbooks:
     masterChanged: ""
     highThroughput: ""
     flapping: ""
+  loadbalancer:
+    noConnectedPeers: ""
+    providerLatency: ""
+    blacklistRate: ""
+    throttleRate: ""
+    connectionTimeouts: ""
+    geoipCacheMiss: ""
+    sessionCleanupBacklog: ""
