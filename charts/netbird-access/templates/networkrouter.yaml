@@ -7,3 +7,7 @@ spec:
   dnsZoneRef:
     name: {{ .Values.dnsZone }}
   logLevel: {{ .Values.router.logLevel }}
+  {{- with .Values.router.workloadOverride }}
+  workloadOverride:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}

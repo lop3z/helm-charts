@@ -13,6 +13,27 @@ dnsZone: ""
 router:
   name: db-access-router
   logLevel: info
+  # Overrides merged onto the operator-created routing-peer pod (by container name), passed straight
+  # through to the NetworkRouter CR's spec.workloadOverride. Set to null to disable (an empty {} still
+  # deep-merges the defaults below).
+  #
+  # The liveness probe below auto-heals a stuck peer: peers registered with an ephemeral setup key are
+  # garbage-collected by NetBird management after ~10 min offline, leaving the daemon in NeedsLogin
+  # forever because the container never restarts to re-run `netbird up --setup-key`. Restarting on a
+  # failed probe re-enrolls it. Thresholds give ~15 min of NeedsLogin before a restart — beyond the GC
+  # window, so transient reconnects don't cause flapping restarts.
+  workloadOverride:
+    podTemplate:
+      spec:
+        containers:
+          - name: netbird
+            livenessProbe:
+              exec:
+                command: ["netbird", "status", "--check", "ready"]
+              initialDelaySeconds: 60
+              periodSeconds: 30
+              failureThreshold: 30
+              timeoutSeconds: 5
 
 # NetworkResources to expose — one per entry. serviceRef = an in-cluster Service (its ClusterIP).
 #   resources:
