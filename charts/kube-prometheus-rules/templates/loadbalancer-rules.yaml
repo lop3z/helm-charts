@@ -28,6 +28,7 @@ spec:
       for: 5m
       labels:
         severity: {{ $sevCrit }}
+        category: functional
 
     - alert: LoadbalancerHighProviderSelectionLatency
       annotations:
@@ -44,6 +45,7 @@ spec:
       for: 5m
       labels:
         severity: {{ $sevWarn }}
+        category: functional
 
     # kind="blocked" — the metric never had kind="blacklisted" (valid: normal|blocked|probation|throttled|expiration)
     - alert: LoadbalancerHighBlacklistRate
@@ -61,6 +63,7 @@ spec:
       for: 5m
       labels:
         severity: {{ $sevWarn }}
+        category: functional
 
     - alert: LoadbalancerHighThrottleRate
       annotations:
@@ -77,6 +80,7 @@ spec:
       for: 15m
       labels:
         severity: {{ $sevWarn }}
+        category: functional
 
     - alert: LoadbalancerConnectionTimeouts
       annotations:
@@ -93,6 +97,7 @@ spec:
       for: 5m
       labels:
         severity: {{ $sevWarn }}
+        category: functional
 
     - alert: LoadbalancerGeoIPCacheMissRate
       annotations:
@@ -113,6 +118,7 @@ spec:
       for: 10m
       labels:
         severity: {{ $sevWarn }}
+        category: functional
 
     # The only emitted series is metric="queued", set to the channel's FREE capacity
     # (Tokio Receiver::capacity() on the 100k channel), so the comparison is inverted:
@@ -132,4 +138,5 @@ spec:
       for: 5m
       labels:
         severity: {{ $sevWarn }}
+        category: functional
 {{- end }}
