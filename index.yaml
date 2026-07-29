@@ -135,6 +135,19 @@ entries:
   kube-prometheus-rules:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-07-29T15:29:01.266111412Z"
+    description: Community-inspired Prometheus alerting rules for Kubernetes observability
+      (PVC, node, pod, disk)
+    digest: b97f84392ff3c98b521a46aeb635b3e6344afd598e4bac5947c5066baa158ebd
+    maintainers:
+    - name: lop3z
+    name: kube-prometheus-rules
+    type: application
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/kube-prometheus-rules-0.17.0/kube-prometheus-rules-0.17.0.tgz
+    version: 0.17.0
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-07-20T15:18:21.030333209Z"
     description: Community-inspired Prometheus alerting rules for Kubernetes observability
       (PVC, node, pod, disk)
@@ -2148,4 +2161,4 @@ entries:
     urls:
     - https://github.com/lop3z/helm-charts/releases/download/wireguard-0.4.0/wireguard-0.4.0.tgz
     version: 0.4.0
-generated: "2026-07-28T08:50:27.120383044Z"
+generated: "2026-07-29T15:29:01.266562175Z"
