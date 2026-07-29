@@ -163,6 +163,34 @@ rules:
     # Warning: free slots remaining on the 100k session-cleanup channel. The app
     # gauge reports FREE capacity, so this fires when free slots drop below the value.
     sessionCleanupFreeSlotsMin: 10000
+  cnpg:
+    # CloudNativePG cluster/database health (replication, WAL archiving, backups,
+    # connection saturation, XID wraparound). Metrics come from the CNPG instance
+    # exporter (:9187) — no PodMonitor needed where Alloy auto-scrapes the named
+    # `metrics` port. Alerts carry category=functional + subcategory=database so the
+    # Mimir alertmanager routes them to the dedicated DB Slack channel.
+    enabled: true
+    warningSuppressed: true
+    criticalSuppressed: true
+    # Replication lag thresholds (seconds).
+    lagWarnSeconds: 30
+    lagCritSeconds: 300
+    # Connection saturation thresholds — fraction of a single instance's max_connections
+    # currently in use (0.8 = 80%).
+    connSaturationWarn: 0.8
+    connSaturationCrit: 0.9
+    # Transaction-ID age thresholds (age of the oldest unfrozen xid). autovacuum's
+    # freeze horizon is ~200M by default; wraparound danger is ~2^31. Warn well before.
+    xidWarn: 300000000
+    xidCrit: 900000000
+    # Seconds since the last successful backup before CNPGLastBackupTooOld fires.
+    # Clusters that never back up (timestamp 0) are excluded by a `> 0` guard.
+    # Default 90000s = 25h (1h grace after a daily backup schedule).
+    backupStaleSeconds: 90000
+    # Deadlock rate threshold (deadlocks/sec) for CNPGDeadlocksSpike. Note this overlaps
+    # the app-level LoadbalancerPgDeadlocks alert; keep conservative to avoid duplicate noise.
+    deadlocksPerSec: 0.1
+
   mimir:
     enabled: true
     warningSuppressed: true
@@ -242,6 +270,19 @@ runbooks:
     connectionTimeouts: ""
     geoipCacheMiss: ""
     sessionCleanupBacklog: ""
+  cnpg:
+    instanceDown: ""
+    noPrimary: ""
+    replicaDisconnected: ""
+    replicationLag: ""
+    walArchiveFailing: ""
+    connectionsSaturated: ""
+    xidWraparound: ""
+    backupFailing: ""
+    lastBackupTooOld: ""
+    manualSwitchover: ""
+    fencing: ""
+    deadlocks: ""
   mimir:
     perTenantSeriesUsage: ""
     ingesterSeriesLimit: ""

@@ -1,0 +1,334 @@
+{{- if .Values.rules.cnpg.enabled }}
+{{- $sevWarn := ternary "wip_warning" "warning" .Values.rules.cnpg.warningSuppressed }}
+{{- $sevCrit := ternary "wip_critical" "critical" .Values.rules.cnpg.criticalSuppressed }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ .Release.Name }}-cnpg
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "kube-prometheus-rules.labels" . | nindent 4 }}
+    gitops.jenkins-x.io/pipeline: namespaces
+spec:
+  groups:
+  - name: kubernetes.cnpg
+    rules:
+    # CloudNativePG cluster/database health.
+    #
+    # Grouping key is (cnpg_io_cluster, cluster_region, namespace): only cnpg_collector_up
+    # carries a `cluster` label — every other CNPG metric identifies its cluster via
+    # cnpg_io_cluster. The same cluster name can exist in several regions (each prod region
+    # runs its own sessions DB), so cluster_region MUST stay in every aggregation to keep
+    # regions separate; it is also surfaced from the firing series into the annotations.
+    #
+    # Routing: every alert carries `category: functional` + `subcategory: database` so the
+    # Mimir alertmanager peels them into the dedicated DB Slack channel (see the
+    # slack-database route in mimir-distributed) instead of the infra channel.
+
+    - alert: CNPGInstanceDown
+      annotations:
+        summary: CNPG instance is down ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          CNPG instance {{ "{{" }} $labels.pod {{ "}}" }} of cluster
+          {{ "{{" }} $labels.cnpg_io_cluster {{ "}}" }} in namespace {{ "{{" }} $labels.namespace {{ "}}" }}
+          is reporting the collector as down on {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        {{- with (.Values.runbooks.cnpg.instanceDown | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        cnpg_collector_up == 0
+      for: 5m
+      labels:
+        severity: {{ $sevCrit }}
+        category: functional
+        subcategory: database
+
+    - alert: CNPGNoPrimary
+      annotations:
+        summary: CNPG cluster has no primary ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          Cluster {{ "{{" }} $labels.cnpg_io_cluster {{ "}}" }} in namespace
+          {{ "{{" }} $labels.namespace {{ "}}" }} has no primary instance
+          (every instance is in recovery) on {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        {{- with (.Values.runbooks.cnpg.noPrimary | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        min by (cnpg_io_cluster, cluster_region, namespace) (cnpg_pg_replication_in_recovery) == 1
+      for: 2m
+      labels:
+        severity: {{ $sevCrit }}
+        category: functional
+        subcategory: database
+
+    - alert: CNPGReplicaDisconnected
+      annotations:
+        summary: CNPG has no streaming replica ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          Cluster {{ "{{" }} $labels.cnpg_io_cluster {{ "}}" }} in namespace
+          {{ "{{" }} $labels.namespace {{ "}}" }} has more than one instance but zero streaming
+          replicas connected to the primary on {{ "{{" }} $labels.cluster_region {{ "}}" }}
+          — replication is broken.
+        {{- with (.Values.runbooks.cnpg.replicaDisconnected | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        (
+          max by (cnpg_io_cluster, cluster_region, namespace) (cnpg_pg_replication_streaming_replicas) == 0
+        )
+        and
+        (
+          count by (cnpg_io_cluster, cluster_region, namespace) (cnpg_collector_up) > 1
+        )
+      for: 5m
+      labels:
+        severity: {{ $sevCrit }}
+        category: functional
+        subcategory: database
+
+    - alert: CNPGReplicationLagHigh
+      annotations:
+        summary: CNPG replication lag high ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          Replication lag on {{ "{{" }} $labels.pod {{ "}}" }} of cluster
+          {{ "{{" }} $labels.cnpg_io_cluster {{ "}}" }} is above
+          {{ .Values.rules.cnpg.lagWarnSeconds }}s on {{ "{{" }} $labels.cluster_region {{ "}}" }}
+          (current: {{ "{{" }} printf "%.1f" $value {{ "}}" }}s).
+        {{- with (.Values.runbooks.cnpg.replicationLag | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        cnpg_pg_replication_lag > {{ .Values.rules.cnpg.lagWarnSeconds }}
+      for: 10m
+      labels:
+        severity: {{ $sevWarn }}
+        category: functional
+        subcategory: database
+
+    - alert: CNPGReplicationLagHigh
+      annotations:
+        summary: CNPG replication lag critically high ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          Replication lag on {{ "{{" }} $labels.pod {{ "}}" }} of cluster
+          {{ "{{" }} $labels.cnpg_io_cluster {{ "}}" }} is above
+          {{ .Values.rules.cnpg.lagCritSeconds }}s on {{ "{{" }} $labels.cluster_region {{ "}}" }}
+          (current: {{ "{{" }} printf "%.1f" $value {{ "}}" }}s).
+        {{- with (.Values.runbooks.cnpg.replicationLag | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        cnpg_pg_replication_lag > {{ .Values.rules.cnpg.lagCritSeconds }}
+      for: 10m
+      labels:
+        severity: {{ $sevCrit }}
+        category: functional
+        subcategory: database
+
+    - alert: CNPGWALArchiveFailing
+      annotations:
+        summary: CNPG WAL archiving is failing ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          The most recent WAL archive attempt for cluster
+          {{ "{{" }} $labels.cnpg_io_cluster {{ "}}" }} in namespace {{ "{{" }} $labels.namespace {{ "}}" }}
+          failed more recently than the last successful archive on
+          {{ "{{" }} $labels.cluster_region {{ "}}" }} — the archive backlog is growing.
+        {{- with (.Values.runbooks.cnpg.walArchiveFailing | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        cnpg_pg_stat_archiver_last_failed_time > cnpg_pg_stat_archiver_last_archived_time
+      for: 5m
+      labels:
+        severity: {{ $sevCrit }}
+        category: functional
+        subcategory: database
+
+    - alert: CNPGConnectionsSaturated
+      annotations:
+        summary: CNPG connections near max_connections ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          Instance {{ "{{" }} $labels.pod {{ "}}" }} of cluster
+          {{ "{{" }} $labels.cnpg_io_cluster {{ "}}" }} is using
+          {{ "{{" }} printf "%.0f" (mulf $value 100) {{ "}}" }}% of max_connections on
+          {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        {{- with (.Values.runbooks.cnpg.connectionsSaturated | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        (
+          sum by (cnpg_io_cluster, cluster_region, namespace, pod) (cnpg_backends_total)
+          / on (cnpg_io_cluster, cluster_region, namespace, pod) group_left
+          cnpg_pg_settings_setting{name="max_connections"}
+        ) > {{ .Values.rules.cnpg.connSaturationWarn }}
+      for: 10m
+      labels:
+        severity: {{ $sevWarn }}
+        category: functional
+        subcategory: database
+
+    - alert: CNPGConnectionsSaturated
+      annotations:
+        summary: CNPG connections critically near max_connections ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          Instance {{ "{{" }} $labels.pod {{ "}}" }} of cluster
+          {{ "{{" }} $labels.cnpg_io_cluster {{ "}}" }} is using
+          {{ "{{" }} printf "%.0f" (mulf $value 100) {{ "}}" }}% of max_connections on
+          {{ "{{" }} $labels.cluster_region {{ "}}" }}. New connections may be refused.
+        {{- with (.Values.runbooks.cnpg.connectionsSaturated | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        (
+          sum by (cnpg_io_cluster, cluster_region, namespace, pod) (cnpg_backends_total)
+          / on (cnpg_io_cluster, cluster_region, namespace, pod) group_left
+          cnpg_pg_settings_setting{name="max_connections"}
+        ) > {{ .Values.rules.cnpg.connSaturationCrit }}
+      for: 10m
+      labels:
+        severity: {{ $sevCrit }}
+        category: functional
+        subcategory: database
+
+    - alert: CNPGTransactionIDWraparound
+      annotations:
+        summary: CNPG transaction ID age high ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          Database {{ "{{" }} $labels.datname {{ "}}" }} on cluster
+          {{ "{{" }} $labels.cnpg_io_cluster {{ "}}" }} has a transaction ID age of
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }} on {{ "{{" }} $labels.cluster_region {{ "}}" }}
+          — approaching wraparound. Check autovacuum.
+        {{- with (.Values.runbooks.cnpg.xidWraparound | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        max by (cnpg_io_cluster, cluster_region, namespace, datname) (cnpg_pg_database_xid_age) > {{ .Values.rules.cnpg.xidWarn }}
+      for: 15m
+      labels:
+        severity: {{ $sevWarn }}
+        category: functional
+        subcategory: database
+
+    - alert: CNPGTransactionIDWraparound
+      annotations:
+        summary: CNPG transaction ID age critically high ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          Database {{ "{{" }} $labels.datname {{ "}}" }} on cluster
+          {{ "{{" }} $labels.cnpg_io_cluster {{ "}}" }} has a transaction ID age of
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }} on {{ "{{" }} $labels.cluster_region {{ "}}" }}
+          — wraparound risk. Autovacuum is not keeping up.
+        {{- with (.Values.runbooks.cnpg.xidWraparound | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        max by (cnpg_io_cluster, cluster_region, namespace, datname) (cnpg_pg_database_xid_age) > {{ .Values.rules.cnpg.xidCrit }}
+      for: 15m
+      labels:
+        severity: {{ $sevCrit }}
+        category: functional
+        subcategory: database
+
+    - alert: CNPGBackupFailing
+      annotations:
+        summary: CNPG backup is failing ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          The most recent backup attempt for cluster {{ "{{" }} $labels.cnpg_io_cluster {{ "}}" }}
+          in namespace {{ "{{" }} $labels.namespace {{ "}}" }} failed more recently than the last
+          successful backup on {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        {{- with (.Values.runbooks.cnpg.backupFailing | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        max by (cnpg_io_cluster, cluster_region, namespace) (cnpg_collector_last_failed_backup_timestamp)
+        >
+        max by (cnpg_io_cluster, cluster_region, namespace) (cnpg_collector_last_available_backup_timestamp)
+      for: 5m
+      labels:
+        severity: {{ $sevCrit }}
+        category: functional
+        subcategory: database
+
+    - alert: CNPGLastBackupTooOld
+      annotations:
+        summary: CNPG last backup too old ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          Cluster {{ "{{" }} $labels.cnpg_io_cluster {{ "}}" }} in namespace
+          {{ "{{" }} $labels.namespace {{ "}}" }} has not had a successful backup in over
+          {{ div .Values.rules.cnpg.backupStaleSeconds 3600 }}h on
+          {{ "{{" }} $labels.cluster_region {{ "}}" }}. Clusters with no backup configured are
+          excluded (last-backup timestamp of 0).
+        {{- with (.Values.runbooks.cnpg.lastBackupTooOld | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        (
+          max by (cnpg_io_cluster, cluster_region, namespace) (cnpg_collector_last_available_backup_timestamp) > 0
+        )
+        and
+        (
+          (
+            time() - max by (cnpg_io_cluster, cluster_region, namespace) (cnpg_collector_last_available_backup_timestamp)
+          ) > {{ .Values.rules.cnpg.backupStaleSeconds }}
+        )
+      for: 30m
+      labels:
+        severity: {{ $sevWarn }}
+        category: functional
+        subcategory: database
+
+    - alert: CNPGManualSwitchoverRequired
+      annotations:
+        summary: CNPG manual switchover required ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          Cluster {{ "{{" }} $labels.cnpg_io_cluster {{ "}}" }} in namespace
+          {{ "{{" }} $labels.namespace {{ "}}" }} is signalling that a manual switchover is
+          required on {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        {{- with (.Values.runbooks.cnpg.manualSwitchover | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        max by (cnpg_io_cluster, cluster_region, namespace) (cnpg_collector_manual_switchover_required) > 0
+      for: 15m
+      labels:
+        severity: {{ $sevWarn }}
+        category: functional
+        subcategory: database
+
+    - alert: CNPGFencingEnabled
+      annotations:
+        summary: CNPG fencing is enabled ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          Fencing is enabled on cluster {{ "{{" }} $labels.cnpg_io_cluster {{ "}}" }} in namespace
+          {{ "{{" }} $labels.namespace {{ "}}" }} on {{ "{{" }} $labels.cluster_region {{ "}}" }}
+          — instances are isolated and not serving. If this is not an intentional maintenance
+          action, investigate.
+        {{- with (.Values.runbooks.cnpg.fencing | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        max by (cnpg_io_cluster, cluster_region, namespace) (cnpg_collector_fencing_on) > 0
+      for: 15m
+      labels:
+        severity: {{ $sevWarn }}
+        category: functional
+        subcategory: database
+
+    - alert: CNPGDeadlocksSpike
+      annotations:
+        summary: CNPG deadlocks occurring ({{ "{{" }} $labels.cluster_region {{ "}}" }})
+        description: >
+          Database {{ "{{" }} $labels.datname {{ "}}" }} on cluster
+          {{ "{{" }} $labels.cnpg_io_cluster {{ "}}" }} is registering deadlocks at
+          {{ "{{" }} printf "%.2f" $value {{ "}}" }}/s on {{ "{{" }} $labels.cluster_region {{ "}}" }}.
+        {{- with (.Values.runbooks.cnpg.deadlocks | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        sum by (cnpg_io_cluster, cluster_region, namespace, datname) (
+          rate(cnpg_pg_stat_database_deadlocks[5m])
+        ) > {{ .Values.rules.cnpg.deadlocksPerSec }}
+      for: 15m
+      labels:
+        severity: {{ $sevWarn }}
+        category: functional
+        subcategory: database
+{{- end }}
