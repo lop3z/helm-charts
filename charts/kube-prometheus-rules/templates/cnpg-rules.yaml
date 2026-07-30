@@ -149,7 +149,7 @@ spec:
         description: >
           Instance {{ "{{" }} $labels.pod {{ "}}" }} of cluster
           {{ "{{" }} $labels.cnpg_io_cluster {{ "}}" }} is using
-          {{ "{{" }} printf "%.0f" (mulf $value 100) {{ "}}" }}% of max_connections on
+          {{ "{{" }} $value | humanizePercentage {{ "}}" }} of max_connections on
           {{ "{{" }} $labels.cluster_region {{ "}}" }}.
         {{- with (.Values.runbooks.cnpg.connectionsSaturated | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
@@ -172,7 +172,7 @@ spec:
         description: >
           Instance {{ "{{" }} $labels.pod {{ "}}" }} of cluster
           {{ "{{" }} $labels.cnpg_io_cluster {{ "}}" }} is using
-          {{ "{{" }} printf "%.0f" (mulf $value 100) {{ "}}" }}% of max_connections on
+          {{ "{{" }} $value | humanizePercentage {{ "}}" }} of max_connections on
           {{ "{{" }} $labels.cluster_region {{ "}}" }}. New connections may be refused.
         {{- with (.Values.runbooks.cnpg.connectionsSaturated | default .Values.runbooks.default) }}
         runbook_url: {{ . }}
