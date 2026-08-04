@@ -1,0 +1,16 @@
+{{- if .Values.consumer.enabled }}
+{{- range .Values.consumer.setupKeys }}
+---
+apiVersion: netbird.io/v1alpha1
+kind: SetupKey
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  name: {{ .name }}
+  ephemeral: {{ .ephemeral | default true }}
+  allowExtraDnsLabels: false
+  autoGroups:
+    {{- toYaml .autoGroups | nindent 4 }}
+{{- end }}
+{{- end }}

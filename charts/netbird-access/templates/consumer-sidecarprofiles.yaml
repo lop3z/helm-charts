@@ -1,0 +1,16 @@
+{{- if .Values.consumer.enabled }}
+{{- range .Values.consumer.sidecarProfiles }}
+---
+apiVersion: netbird.io/v1alpha1
+kind: SidecarProfile
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  podSelector:
+    {{- toYaml .podSelector | nindent 4 }}
+  setupKeyRef:
+    {{- toYaml .setupKeyRef | nindent 4 }}
+  injectionMode: {{ .injectionMode | default "Sidecar" }}
+{{- end }}
+{{- end }}

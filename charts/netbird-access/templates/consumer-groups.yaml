@@ -1,0 +1,12 @@
+{{- if .Values.consumer.enabled }}
+{{- range .Values.consumer.groups }}
+---
+apiVersion: netbird.io/v1alpha1
+kind: Group
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  name: {{ .name }}
+{{- end }}
+{{- end }}
