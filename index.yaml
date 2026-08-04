@@ -1185,6 +1185,18 @@ entries:
   netbird-access:
   - apiVersion: v2
     appVersion: 0.6.0
+    created: "2026-08-04T18:50:25.159903096Z"
+    description: NetBird CRs exposing in-cluster services over WireGuard (router +
+      resources + wrappers), plus optional consumer-side sidecar injection, configurable
+      per cluster
+    digest: 7a90dcb529e1cb70645da2a589e869b26a34d75a5536ee87eaaedaeb56459295
+    name: netbird-access
+    type: application
+    urls:
+    - https://github.com/lop3z/helm-charts/releases/download/netbird-access-0.5.0/netbird-access-0.5.0.tgz
+    version: 0.5.0
+  - apiVersion: v2
+    appVersion: 0.6.0
     created: "2026-07-28T08:50:27.120166669Z"
     description: NetBird CRs (router + resources + wrappers) exposing in-cluster services
       over WireGuard, configurable per cluster
@@ -2174,4 +2186,4 @@ entries:
     urls:
     - https://github.com/lop3z/helm-charts/releases/download/wireguard-0.4.0/wireguard-0.4.0.tgz
     version: 0.4.0
-generated: "2026-07-30T10:17:23.767881313Z"
+generated: "2026-08-04T18:50:25.160234655Z"
