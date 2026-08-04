@@ -127,3 +127,34 @@ curl "http://<clickhouse-route>:8123/?user=default&password=..." --data-binary "
 mongosh "mongodb://<mongos-route>:27017/" --username <user> --authenticationDatabase admin
 ```
 Routes/addresses: `netbird networks list` (or NetBird portal → Networks).
+
+## Consumer side (sidecar injection)
+
+Inject a NetBird client into a pod so it can *reach* NetBird resources (reverse of exposure). Set
+`consumer.enabled: true` and declare `groups`, `setupKeys`, `sidecarProfiles`. A SetupKey enrolls a
+*machine* peer, so its group may be operator-created — the `Group` CR makes it (the operator retries
+the SetupKey until the group exists). The CRs render in the release namespace, so deploy this release
+in the consuming pod's namespace (a SidecarProfile podSelector only matches same-namespace pods).
+
+```yaml
+consumer:
+  enabled: true
+  groups:
+    - { name: netbird-grafana }
+  setupKeys:
+    - { name: grafana-netbird, ephemeral: true, autoGroups: [ { name: netbird-grafana } ] }
+  sidecarProfiles:
+    - name: grafana-netbird
+      podSelector: { matchLabels: { app.kubernetes.io/name: grafana } }
+      setupKeyRef: { name: grafana-netbird }
+      injectionMode: Sidecar
+```
+
+Access still needs a policy. The `NBPolicy` CRD is group→group only and can't target a resource, so
+create it via the API (one per resource):
+```bash
+export NB_TOKEN=$(kubectl -n netbird get secret netbird-mgmt-api-key -o jsonpath='{.data.NB_API_KEY}' | base64 -d)
+GRP=$(curl -s -H "Authorization: Token $NB_TOKEN" "$API/groups" | jq -r '.[]|select(.name=="netbird-grafana")|.id')
+curl -s -X POST -H "Authorization: Token $NB_TOKEN" -H "Content-Type: application/json" \
+  -d "{\"name\":\"grafana-<res>\",\"enabled\":true,\"rules\":[{\"name\":\"<res>\",\"enabled\":true,\"action\":\"accept\",\"bidirectional\":true,\"protocol\":\"all\",\"sources\":[\"$GRP\"],\"destinationResource\":{\"id\":\"<res-id>\",\"type\":\"host\"}}]}" "$API/policies"
+```

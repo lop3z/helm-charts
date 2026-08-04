@@ -50,3 +50,11 @@ clusterIpServices: []
 # Optional selector-less Service + Endpoints (for OFF-cluster targets, e.g. external mongos). e.g.
 #   - { name: mongo-netbird, portName: mongo, externalHost: 51.68.95.180, port: 27017 }
 externalServices: []
+
+# Consumer side: inject a NetBird sidecar into pods so they can reach NetBird resources (access still
+# needs a per-resource policy — manual API, see README).
+consumer:
+  enabled: false
+  groups: []           # [{ name }]  — machine groups created via Group CR
+  setupKeys: []        # [{ name, ephemeral, autoGroups: [{ name }] }]
+  sidecarProfiles: []  # [{ name, podSelector, setupKeyRef: { name }, injectionMode }]

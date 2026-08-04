@@ -1,3 +1,5 @@
+{{- /* Skipped when router.name is empty (e.g. a consumer-only release that only injects sidecars). */}}
+{{- if .Values.router.name }}
 apiVersion: netbird.io/v1alpha1
 kind: NetworkRouter
 metadata:
@@ -11,3 +13,4 @@ spec:
   workloadOverride:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+{{- end }}
