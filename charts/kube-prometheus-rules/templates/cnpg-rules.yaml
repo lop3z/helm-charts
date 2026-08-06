@@ -42,6 +42,9 @@ spec:
         severity: {{ $sevCrit }}
         category: functional
         subcategory: database
+        {{- with .Values.rules.cnpg.alertLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
 
     - alert: CNPGNoPrimary
       annotations:
@@ -60,6 +63,9 @@ spec:
         severity: {{ $sevCrit }}
         category: functional
         subcategory: database
+        {{- with .Values.rules.cnpg.alertLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
 
     - alert: CNPGReplicaDisconnected
       annotations:
@@ -85,6 +91,9 @@ spec:
         severity: {{ $sevCrit }}
         category: functional
         subcategory: database
+        {{- with .Values.rules.cnpg.alertLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
 
     - alert: CNPGReplicationLagHigh
       annotations:
@@ -104,6 +113,9 @@ spec:
         severity: {{ $sevWarn }}
         category: functional
         subcategory: database
+        {{- with .Values.rules.cnpg.alertLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
 
     - alert: CNPGReplicationLagHigh
       annotations:
@@ -123,6 +135,9 @@ spec:
         severity: {{ $sevCrit }}
         category: functional
         subcategory: database
+        {{- with .Values.rules.cnpg.alertLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
 
     - alert: CNPGWALArchiveFailing
       annotations:
@@ -142,6 +157,9 @@ spec:
         severity: {{ $sevCrit }}
         category: functional
         subcategory: database
+        {{- with .Values.rules.cnpg.alertLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
 
     - alert: CNPGConnectionsSaturated
       annotations:
@@ -165,6 +183,9 @@ spec:
         severity: {{ $sevWarn }}
         category: functional
         subcategory: database
+        {{- with .Values.rules.cnpg.alertLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
 
     - alert: CNPGConnectionsSaturated
       annotations:
@@ -188,6 +209,9 @@ spec:
         severity: {{ $sevCrit }}
         category: functional
         subcategory: database
+        {{- with .Values.rules.cnpg.alertLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
 
     - alert: CNPGTransactionIDWraparound
       annotations:
@@ -207,6 +231,9 @@ spec:
         severity: {{ $sevWarn }}
         category: functional
         subcategory: database
+        {{- with .Values.rules.cnpg.alertLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
 
     - alert: CNPGTransactionIDWraparound
       annotations:
@@ -226,6 +253,9 @@ spec:
         severity: {{ $sevCrit }}
         category: functional
         subcategory: database
+        {{- with .Values.rules.cnpg.alertLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
 
     - alert: CNPGBackupFailing
       annotations:
@@ -246,6 +276,9 @@ spec:
         severity: {{ $sevCrit }}
         category: functional
         subcategory: database
+        {{- with .Values.rules.cnpg.alertLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
 
     - alert: CNPGLastBackupTooOld
       annotations:
@@ -274,6 +307,9 @@ spec:
         severity: {{ $sevWarn }}
         category: functional
         subcategory: database
+        {{- with .Values.rules.cnpg.alertLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
 
     - alert: CNPGManualSwitchoverRequired
       annotations:
@@ -292,6 +328,9 @@ spec:
         severity: {{ $sevWarn }}
         category: functional
         subcategory: database
+        {{- with .Values.rules.cnpg.alertLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
 
     - alert: CNPGFencingEnabled
       annotations:
@@ -311,6 +350,9 @@ spec:
         severity: {{ $sevWarn }}
         category: functional
         subcategory: database
+        {{- with .Values.rules.cnpg.alertLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
 
     - alert: CNPGDeadlocksSpike
       annotations:
@@ -331,4 +373,7 @@ spec:
         severity: {{ $sevWarn }}
         category: functional
         subcategory: database
+        {{- with .Values.rules.cnpg.alertLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
 {{- end }}

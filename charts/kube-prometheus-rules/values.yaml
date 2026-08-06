@@ -190,6 +190,11 @@ rules:
     # Deadlock rate threshold (deadlocks/sec) for CNPGDeadlocksSpike. Note this overlaps
     # the app-level LoadbalancerPgDeadlocks alert; keep conservative to avoid duplicate noise.
     deadlocksPerSec: 0.1
+    # Ownership labels added to every CNPG alert (app_team routes to the functional channel).
+    alertLabels:
+      app_name: psgl-sessions
+      app_component: loadbalancer
+      app_team: dev
 
   mimir:
     enabled: true
