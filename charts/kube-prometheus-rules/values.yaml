@@ -222,6 +222,8 @@ rules:
     # and too-old samples are excluded since they reflect client clock skew, not capacity.
     discardWarnRate: 0
     discardCritRate: 10
+    # DEV-300: RF-adjusted total active-series ceiling for MimirActiveSeriesCardinalityHigh.
+    cardinalityWarnThreshold: 8500000
 
 # Runbook URLs for each alert — set to your internal Notion/Confluence pages in the version stream.
 # Leave empty ("") to omit the runbook_url annotation from the PrometheusRule.
@@ -293,3 +295,4 @@ runbooks:
     ingesterSeriesLimit: ""
     ingesterTenantsLimit: ""
     samplesDiscardedByLimits: ""
+    cardinalityHigh: ""
