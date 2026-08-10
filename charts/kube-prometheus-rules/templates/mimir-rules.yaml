@@ -58,6 +58,28 @@ spec:
       labels:
         severity: {{ $sevCrit }}
 
+  # DEV-300: flat total active-series ceiling (RF-adjusted); dev may set it low to test.
+  - name: mimir.cardinality
+    rules:
+    - alert: MimirActiveSeriesCardinalityHigh
+      annotations:
+        description: >
+          Total Mimir active series (RF-adjusted) is
+          {{ "{{" }} printf "%.0f" $value {{ "}}" }}, above the cardinality warning
+          threshold of {{ printf "%.0f" (.Values.rules.mimir.cardinalityWarnThreshold | float64) }}.
+          Reduce high-cardinality scrapes or raise the per-tenant cap before Mimir
+          starts dropping new series.
+        summary: Mimir active-series cardinality high
+        {{- with (.Values.runbooks.mimir.cardinalityHigh | default .Values.runbooks.default) }}
+        runbook_url: {{ . }}
+        {{- end }}
+      expr: |-
+        sum(cortex_ingester_active_series) / {{ .Values.rules.mimir.replicationFactor }}
+          > {{ printf "%.0f" (.Values.rules.mimir.cardinalityWarnThreshold | float64) }}
+      for: 15m
+      labels:
+        severity: {{ $sevWarn }}
+
   # Per-ingester instance limits. Ported from upstream mimir-mixin.
   # These only fire when ingester.instance_limits.max_series / max_tenants are set > 0
   # in Mimir; with the default (0 = unlimited) the alert is a no-op.
