@@ -2,7 +2,7 @@ apiVersion: v2
 name: grafana-dashboards
 description: Grafana dashboards for Kubernetes observability — PVC, Node Exporter, Alerts Overview, WireGuard tunnels
 type: application
-version: 0.3.0
+version: 0.3.1
 appVersion: "1.0.0"
 maintainers:
   - name: lop3z

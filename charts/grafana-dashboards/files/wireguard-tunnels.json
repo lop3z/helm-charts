@@ -201,7 +201,7 @@
               }
             ]
           },
-          "unit": "Bps"
+          "unit": "bps"
         }
       },
       "gridPos": {
@@ -228,7 +228,7 @@
       "pluginVersion": "10.0.0",
       "targets": [
         {
-          "expr": "sum(rate(wireguard_sent_bytes_total{instance=~\"$instance\"}[5m])) + sum(rate(wireguard_received_bytes_total{instance=~\"$instance\"}[5m]))",
+          "expr": "(sum(rate(wireguard_sent_bytes_total{instance=~\"$instance\"}[5m])) + sum(rate(wireguard_received_bytes_total{instance=~\"$instance\"}[5m]))) * 8",
           "legendFormat": "Aggregate",
           "refId": "A"
         }
@@ -469,7 +469,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Bytes received per peer per second (incoming tunnel traffic).",
+      "description": "Bits received per peer per second (incoming tunnel traffic).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -484,7 +484,7 @@
               "group": "A"
             }
           },
-          "unit": "Bps"
+          "unit": "bps"
         }
       },
       "gridPos": {
@@ -511,7 +511,7 @@
       },
       "targets": [
         {
-          "expr": "rate(wireguard_received_bytes_total{instance=~\"$instance\"}[5m])",
+          "expr": "rate(wireguard_received_bytes_total{instance=~\"$instance\"}[5m]) * 8",
           "legendFormat": "{{instance}}",
           "refId": "A"
         }
@@ -524,7 +524,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Bytes sent per peer per second (outgoing tunnel traffic).",
+      "description": "Bits sent per peer per second (outgoing tunnel traffic).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -539,7 +539,7 @@
               "group": "A"
             }
           },
-          "unit": "Bps"
+          "unit": "bps"
         }
       },
       "gridPos": {
@@ -566,7 +566,7 @@
       },
       "targets": [
         {
-          "expr": "rate(wireguard_sent_bytes_total{instance=~\"$instance\"}[5m])",
+          "expr": "rate(wireguard_sent_bytes_total{instance=~\"$instance\"}[5m]) * 8",
           "legendFormat": "{{instance}}",
           "refId": "A"
         }
@@ -1073,7 +1073,7 @@
             "fillOpacity": 20,
             "lineWidth": 1
           },
-          "unit": "Bps"
+          "unit": "bps"
         }
       },
       "gridPos": {
@@ -1099,12 +1099,12 @@
       },
       "targets": [
         {
-          "expr": "rate(node_network_receive_bytes_total{device=\"ens3\", instance=~\"$instance\"}[5m])",
+          "expr": "rate(node_network_receive_bytes_total{device=\"ens3\", instance=~\"$instance\"}[5m]) * 8",
           "legendFormat": "{{instance}} RX",
           "refId": "A"
         },
         {
-          "expr": "rate(node_network_transmit_bytes_total{device=\"ens3\", instance=~\"$instance\"}[5m])",
+          "expr": "rate(node_network_transmit_bytes_total{device=\"ens3\", instance=~\"$instance\"}[5m]) * 8",
           "legendFormat": "{{instance}} TX",
           "refId": "B"
         }
@@ -1128,7 +1128,7 @@
             "fillOpacity": 20,
             "lineWidth": 1
           },
-          "unit": "Bps"
+          "unit": "bps"
         }
       },
       "gridPos": {
@@ -1154,12 +1154,12 @@
       },
       "targets": [
         {
-          "expr": "rate(node_network_receive_bytes_total{device=\"ens4\", instance=~\"$instance\"}[5m])",
+          "expr": "rate(node_network_receive_bytes_total{device=\"ens4\", instance=~\"$instance\"}[5m]) * 8",
           "legendFormat": "{{instance}} RX",
           "refId": "A"
         },
         {
-          "expr": "rate(node_network_transmit_bytes_total{device=\"ens4\", instance=~\"$instance\"}[5m])",
+          "expr": "rate(node_network_transmit_bytes_total{device=\"ens4\", instance=~\"$instance\"}[5m]) * 8",
           "legendFormat": "{{instance}} TX",
           "refId": "B"
         }
