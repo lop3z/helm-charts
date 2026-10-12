@@ -15,6 +15,7 @@ router: { name: jx-staging-router }
 resources:
   - { name: redis,      serviceRef: redis-cluster }      # point straight at an existing ClusterIP
   - { name: clickhouse, serviceRef: clickhouse-netbird } # or at a wrapper below
+  - { name: bench-pg, serviceRef: bench-pg-rw, namespace: bench } # Service in another namespace
 clusterIpServices:                                       # only if you need a wrapper / port-scope
   - { name: clickhouse-netbird, selector: {...}, ports: [ {name: http, port: 8123}, {name: tcp, port: 9000} ] }
 externalServices:                                        # only for off-cluster targets
@@ -25,6 +26,10 @@ externalServices:                                        # only for off-cluster 
 > in-cluster **ClusterIP with the ports you want**. Add a `clusterIpServices` wrapper to **scope ports**
 > (a `NetworkResource` exposes the *whole* Service) or for NodePort/headless services. Add an
 > `externalServices` wrapper only for **off-cluster** endpoints (no in-cluster pods/endpoints).
+>
+> **Service in another namespace?** `serviceRef` can only name a Service in the NetworkResource's own
+> namespace, so set `namespace:` on the entry — the NetworkResource is created there and still uses the
+> router in the release namespace. DNS name = `<serviceRef>.<namespace>.<dnsZone>`.
 
 **This chart does NOT create the access Groups or any SetupKeys** — see the access model below for why.
 

@@ -38,6 +38,7 @@ router:
 # NetworkResources to expose — one per entry. serviceRef = an in-cluster Service (its ClusterIP).
 #   resources:
 #     - { name: redis, serviceRef: redis-cluster }
+#     - { name: bench-pg, serviceRef: bench-pg-rw, namespace: bench }   # Service outside the release ns
 resources: []
 
 # Optional plain-ClusterIP wrappers (for in-cluster services that are NodePort/headless, or to scope
